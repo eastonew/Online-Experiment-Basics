@@ -1,0 +1,64 @@
+{
+	"info": {
+		"_postman_id": "e3849b2f-ef3b-4e4a-a054-82df95f10c7c",
+		"name": "Experiment Api - Local",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Get Experiment Definition",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "https://localhost:44314/api/experiment?participantId=test2",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44314",
+					"path": [
+						"api",
+						"experiment"
+					],
+					"query": [
+						{
+							"key": "participantId",
+							"value": "test2"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Add Log",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"ApiKey\": \"b1d05b2d-cbec-40e9-9b47-45170e076647\",\r\n  \"Message\": \"Participant entered \",\r\n  \"AddedDateTicks\": 637473595166398799,\r\n  \"ParticipantId\": \"test\",\r\n  \"LogDate\": \"2021-01-27T15:51:56.6398799Z\",\r\n  \"AdditionalValues\": [\r\n    {\r\n      \"Key\": null,\r\n      \"Value\": \"Yes\"\r\n    }\r\n  ]\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "https://localhost:44314/api/log",
+					"protocol": "https",
+					"host": [
+						"localhost"
+					],
+					"port": "44314",
+					"path": [
+						"api",
+						"log"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
