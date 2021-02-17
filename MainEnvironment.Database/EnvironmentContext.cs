@@ -16,6 +16,7 @@ namespace MainEnvironment.Database
         public DbSet<Participant> Participants { get; set; }
         public DbSet<Log> Logs { get; set; }
         public DbSet<ConsentFormClause> ConsentFormClauses { get; set; }
+        public DbSet<DownloadInstructions> DownloadInstructions { get; set; }
     }
 
 }

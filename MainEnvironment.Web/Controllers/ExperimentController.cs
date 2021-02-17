@@ -42,12 +42,5 @@ namespace MainEnvironment.Web.Controllers
             var result = await this.ExperimentRepo.CompleteExperiment(model.ParticipantId, model.ApiKey);
             return StatusCode((int)HttpStatusCode.OK, result);
         }
-
-        [HttpPost("AcceptConsentForm")]
-        public async Task<ActionResult> AcceptConsentForm(ExperimentRequest model)
-        {
-            var result = await this.ExperimentRepo.MarkConsentFormAsAccepted(model.ParticipantId, model.ApiKey);
-            return StatusCode((int)HttpStatusCode.OK, result);
-        }
     }
 }

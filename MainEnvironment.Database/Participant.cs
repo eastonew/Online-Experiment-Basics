@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MainEnvironment.Core.Enums;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
@@ -16,5 +17,6 @@ namespace MainEnvironment.Database
         public DateTime? KeyExpirationDate { get; set; }
         public bool ConsentFormAccepted { get; set; }
         public DateTime? ConsentFormAcceptedDate { get; set; }
+        public EquipmentTypeEnum EquipmentType { get; set; }
     }
 }

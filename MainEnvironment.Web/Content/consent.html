@@ -1,0 +1,312 @@
+﻿<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <title>Download Experiment Software</title>
+    <style>
+        .input {
+            padding: 15px;
+            width: 450px;
+            height: 15px;
+            font-size: 15px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            color: #000000;
+        }
+        select {
+            padding: 5px;
+            width: 450px;
+            height: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            display: block;
+            color: #000000;
+        }
+            select option {
+                color: black;
+            }
+
+        .lblClauseText, .chkAccept {
+            padding: 5px;
+            width: 250px;
+            height: 30px;
+            margin-left: auto;
+            margin-right: auto;
+            display: inline-block;
+            color: #000000;
+        }
+        .input.error{
+            border: 2px solid red;
+        }
+        select.error {
+            border: 2px solid red;
+        }
+        .header {
+            border-bottom: 1px solid #4B0052;
+            padding: 10px;
+            position: relative;
+            background-color: #E403FB; 
+            margin: 0;
+            margin-bottom: 10px;
+            height: 9vh;
+        }
+            .header h1 {
+                width: 80vw;
+                position: absolute;
+                right:0;
+            }
+        .header img{
+            width:15vw;
+            position: absolute;
+            left: 2vh;
+        }
+
+        span {
+            padding: 5px;
+            font-size: 25px;
+            width: 80%;
+            text-align: center;
+        }
+
+        body, html {
+            padding: 0;
+            margin: 0;
+            background-color: #A500B6;
+        }
+
+        .description {
+            margin-bottom: 50px;
+        }
+
+        .participant-id-form {
+            width: 80%;
+            display: block;
+            margin-left: auto;
+            margin-right: auto;
+            height: 700px;
+            background-color: #FFFFFF;
+            text-align: center;
+            margin-top: 50px;
+            border: 1px solid #4B0052;
+            color: #000000;
+        }
+
+        
+        .participant-id, .complete-button, .headset-type, .clause {
+            border-top: 2px solid #4B0052;
+            border-left: 2px solid #4B0052;
+            border-right: 2px solid #4B0052;
+            padding: 2vh;
+            width: 650px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+        .complete-button {
+            border-bottom: 2px solid #4B0052;
+        }
+
+        .submit-button, .submit-consent-button {
+            width: 250px;
+            background-color: #E50051;
+            height: 30px;
+            vertical-align: middle;
+            position: relative;
+            display: block;
+            margin-right: auto;
+            margin-left: auto;
+            padding: 5px;
+            cursor: pointer;
+            user-select: none;
+        }
+
+            .submit-button:hover {
+                background-color: #6E0027;
+            }
+        .user-message {
+            display: none;
+            z-index: 5;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            padding: 10px;
+            border: 1px solid #4B0052;
+            position: absolute;
+            background-color: rgba(58,0,149, 0.95);
+        }
+        .user-message .message
+        {
+             padding:5px;
+             margin-top: 10px;
+        }
+    </style>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        $(document).ready(function () {
+
+            $(".submit-button").on("click", function () {
+                var id = $(".input").val();
+                var equipment = $("#ddlHeadset").val();
+                
+                if (!id || !equipment) {
+                    if (!id) {
+                        $(".input").addClass("error");
+                        $(".participant-id .user-message .message").text("Please enter a value to continue");
+                        $(".participant-id .user-message").show("fast");
+                        setTimeout(function () {
+                            $(".participant-id .user-message").hide("slow");
+                        }, 2000);
+                    }
+                    if (!equipment) {
+                        $("#ddlHeadset").addClass("error");
+                        $(".headset-type .user-message .message").text("Please select a value to continue");
+                        $(".headset-type .user-message").show("fast");
+                        setTimeout(function () {
+                            $(".headset-type .user-message").hide("slow");
+                        }, 2000);
+                    }
+                }
+                else {
+                    $(".input").removeClass("error");
+                    $("#ddlHeadset").removeClass("error");
+                    $.ajax
+                        ({
+                            type: "POST",
+                            url: "download/getconsentform",
+                            contentType: "application/json",
+                            data: JSON.stringify({ participantId: id, equipmentType: equipment })
+                        }).done(function (data) {
+                            $(".form").hide();
+                            $(".consent-form").show();
+                            $("#hdnParticipantId").val(data.participantId);
+                            for (var i = 0; i < data.clauses.length; i++) {
+                                var clause = data.clauses[i];
+                                var $clause = $(".consent-form .clause").not(':visible').clone();
+                                $clause.find(".chkAccept").val(clause.id);
+                                $clause.find(".lblClauseText").text(clause.clause);
+                                $clause.show().insertBefore($(".consent-form .complete-button"));
+                            }
+                        })
+                        .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
+                }
+            });
+
+            $(".submit-consent-button").on("click", function () {
+                var clauses = $(".clause:visible");
+                var consentModel = {
+                    participantId: $("#hdnParticipantId").val(),
+                    clauses: []
+                };
+                var allConfirmed = true;
+                for (var i = 0; i < clauses.length; i++) {
+                    var $clause = $(clauses[i]);
+                    var $chk = $clause.find(".chkAccept");
+                    var accepted = $chk.prop("checked");
+                    allConfirmed &= accepted;
+                    if (accepted) {
+                        var id = $chk.val();
+                        //need to build model and send to server
+                        var clause = {
+                            id: id,
+                            accepted: true,
+                            acceptedDate: new Date().toISOString()
+                        };
+                        consentModel.clauses.push(clause);
+                    }
+                    else {
+                        $chk.addClass("error");
+                        $clause.find(".user-message .message").text("Please confirm you accept this clause to continue");
+                        $clause.find(".user-message").show("fast");
+                        setTimeout(function () {
+                            $(".clause:visible").find(".user-message").hide("slow");
+                        }, 2000);
+                    }
+                }
+
+                if (allConfirmed) {
+                    console.log(JSON.stringify(consentModel));
+                    $.ajax
+                        ({
+                            type: "POST",
+                            url: "download/SubmitConsentForm",
+                            contentType: "application/json",
+                            data: JSON.stringify(consentModel)
+                        }).done(function (data) {
+                            $(".consent-form").hide();
+                            $(".instructions").show();
+                            $(".instructions .details").html(data.instructions);
+                        })
+                        .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
+                }
+
+            });
+        });
+    </script>
+</head>
+<body>
+    <div class="participant-id-form">
+        <div class="header">
+            <img src="aston-logo.svg" />
+            <h1>Experiment download form</h1>
+        </div>
+        <div class="form">
+            <div class="description">
+                <span>Welcome this portal will allow you to consent to the experiment you are registered for and recieve the instructions for download.</span>
+                <br />
+                <br />
+                <span>Please begin by entering your participant Id below</span>
+            </div>
+            <div class="participant-id">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
+                </div>
+                <input type="text" placeholder="Enter your participant Id..." class="input" />
+            </div>
+            <div class="headset-type">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
+                </div>
+                <select id="ddlHeadset">
+                    <option value="" selected>Not selected</option>
+                    <option value="2">Quest</option>
+                    <option value="3">Quest 2</option>
+                    <option value="1">HTC Vive</option>
+                </select>
+            </div>
+            <div class="complete-button">
+                <div class="submit-button"><span>Submit</span></div>
+            </div>
+        </div>
+
+        <div class="consent-form" style="display:none">
+            <div class="description">
+                <span>The consent form for this experiment is shown here</span>
+                <br />
+                <br />
+                <span>Please confirm that you consent to these terms</span>
+            </div>
+            <input type="hidden" id="hdnParticipantId" />
+            <div class="clause" style="display:none">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
+                </div>
+                <label class="lblClauseText"></label>
+                <input type="checkbox" class="chkAccept" />
+            </div>
+            <div class="complete-button">
+                <div class="submit-consent-button"><span>Submit</span></div>
+            </div>
+        </div>
+        <div class="instructions" style="display:none">
+            <span>Thank you for consenting to this experiment, in order to continue, please follow these instructions</span><br /><br />
+            <span class="details"></span> <br /><br />
+            <span>Once you are happy with the instructions you can close this window</span>
+        </div>
+    </div>
+</body>
+</html>

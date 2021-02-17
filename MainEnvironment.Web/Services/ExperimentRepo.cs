@@ -1,4 +1,5 @@
 ﻿using MainEnvironment.Core;
+using MainEnvironment.Core.Enums;
 using MainEnvironment.Core.Interfaces;
 using MainEnvironment.Core.Models;
 using MainEnvironment.Database;
@@ -23,7 +24,7 @@ namespace MainEnvironment.Web.Services
         {
             SceneModel details = null;
             //if a participant has a key assigned they have tried the experiment before
-            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && (p.ApiKey == null || p.KeyExpirationDate > DateTime.UtcNow));
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && p.ConsentFormAccepted && (p.ApiKey == null || p.KeyExpirationDate > DateTime.UtcNow));
             if(participant != null && participant.ExperimentId != null)
             {
                 //if the participant has any existing logs - delete these out of the database 
@@ -45,7 +46,7 @@ namespace MainEnvironment.Web.Services
                     {
                         details = new SceneModel();
                     }
-                    details.ConsentClauses = await Context.ConsentFormClauses.Where(c => c.ExperimentId == experiment.Id).Select(c=>new ConsentClauseModel() { Clause = c.Clause }).ToArrayAsync();
+                   
                     //ideally this will be a cryptographically secure key but for now just send a unique Guid
                     Guid key = Guid.NewGuid();
                     details.ApiKey = key.ToString();
@@ -59,25 +60,58 @@ namespace MainEnvironment.Web.Services
             return details;
         }
 
-        public async Task<bool> MarkConsentFormAsAccepted(string participantId, string key)
+        public async Task<bool> UpdateParticipantEquipment(string participantId, EquipmentTypeEnum equipment)
         {
-            bool success = true;
-            try
+            bool success = false;
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed);
+            if (participant != null)
             {
-                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && p.ApiKey == key);
-                if (participant != null && participant.ExperimentId != null)
-                {
-                    participant.ConsentFormAccepted = true;
-                    participant.ConsentFormAcceptedDate = DateTime.UtcNow;
-                    Context.Update(participant);
-                    await this.Context.SaveChangesAsync();
-                }
-            }
-            catch
-            {
-                success = false;
+                participant.EquipmentType = equipment;
+                await this.Context.SaveChangesAsync();
+                success = true;
             }
             return success;
+        }
+
+        public async Task<ConsentFormModel> GetConsentForm(string participantId)
+        {
+            ConsentFormModel details = null;
+            //if a participant has a key assigned they have tried the experiment before
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && !p.ConsentFormAccepted);
+            if (participant != null && participant.ExperimentId != null)
+            {
+                var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == participant.ExperimentId && e.IsLive);
+                if (experiment != null)
+                {
+                    details = new ConsentFormModel();
+                    details.ParticipantId = participantId;
+                    details.Clauses = await Context.ConsentFormClauses.Where(c => c.ExperimentId == experiment.Id).Select(c => new ConsentClauseModel() { Clause = c.Clause, Accepted = false, Id = c.Id }).ToListAsync();
+                }
+            }
+            return details;
+        }
+
+        public async Task<ParticipantModel> MarkConsentFormAsAccepted(string participantId)
+        {
+            ParticipantModel participant = null;
+            try
+            {
+                var participantDetails = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed);
+                if (participantDetails != null && participantDetails.ExperimentId != null)
+                {
+                    participantDetails.ConsentFormAccepted = true;
+                    participantDetails.ConsentFormAcceptedDate = DateTime.UtcNow;
+                    Context.Update(participantDetails);
+                    await this.Context.SaveChangesAsync();
+                    participant = new ParticipantModel();
+                    participant.EquipmentType = participantDetails.EquipmentType;
+                    participant.ParticipantId = participantDetails.ExternalParticipantId;
+                }
+            }
+            catch(Exception ex)
+            {
+            }
+            return participant;
         }
 
         public async Task<bool> CompleteExperiment(string participantId, string key)
