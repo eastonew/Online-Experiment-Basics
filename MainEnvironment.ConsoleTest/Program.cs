@@ -1,7 +1,10 @@
 ﻿using MainEnvironment.Core;
+using MainEnvironment.Core.Enums;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Numerics;
 
 namespace MainEnvironment.ConsoleTest
@@ -28,39 +31,58 @@ namespace MainEnvironment.ConsoleTest
                 Rooms = new RoomModel[1]
                 {
                     new RoomModel()
-             {
-                 Order = 0,
-                 ShowDoorCaps = true,
-                 Pedestals = new PedestalModel[1]
-                 {
-                     new PedestalModel()
-                     {
-                          Position = new Vector3(0,0,0),
-                           Scale = new Vector3(3,0.5f,3),
-                            Sculpture = new SculptureModel()
-                            {
-                                Shapes = new List<ComponentModel>()
-                            }
-                     }
-                }
-                 }
+                    {
+                         Order = 0,
+                         ShowDoorCaps = true,
+                         Depth = 50,
+                         Height = 5,
+                         Width = 50,
+                         Pedestals = new PedestalModel[150]
+                    }
                 }
             };
 
-            for(int i = 0; i < 100; i++)
+            Random rand = new Random();
+            for (int i = 0; i < 5; i++)
             {
-               var component = new ComponentModel()
+                
+                var sculptureJson = File.ReadAllText($@"H:\Sculpturs\MainExperimentTest\SmallItems\Item{i}.json");
+                var sculpture = JsonConvert.DeserializeObject<SculptureExport>(sculptureJson);
+                model.Rooms[0].Pedestals[i] = new PedestalModel()
                 {
-                    Position = new Vector3(0, 0.01f * i, 0.02f * i),
-                    Shape = new ShapeModel()
+                    Position = new Vector3(rand.Next(0,50)-25, 0, rand.Next(0,50)-25),
+                    Scale = new Vector3(3, 0.5f, 3),
+                    Sculpture = new SculptureModel()
                     {
-                        BaseShape = ShapeModel.ShapeModelBaseEnum.Sphere,
-                        Scale = new Vector3(0.05f, 0.05f, 0.05f)
+                        Shapes = sculpture.CalculatedPoints.Select(p => new ComponentModel()
+                        {
+                             Position = p,
+                              Shape = new ShapeModel()
+                              {
+                                  BaseShape = ShapeModel.ShapeModelBaseEnum.Sphere,
+                                  Scale = new Vector3(0.05f, 0.05f, 0.05f)
+                              }
+                        }).ToList(),
+                        AvailableActions = ActionEnum.Translation & ActionEnum.RotationY
                     }
                 };
-
-                model.Rooms[0].Pedestals[0].Sculpture.Shapes.Add(component);
             }
+            
+
+            //for(int i = 0; i < 100; i++)
+            //{
+            //   var component = new ComponentModel()
+            //    {
+            //        Position = new Vector3(0, 0.01f * i, 0.02f * i),
+            //        Shape = new ShapeModel()
+            //        {
+            //            BaseShape = ShapeModel.ShapeModelBaseEnum.Sphere,
+            //            Scale = new Vector3(0.05f, 0.05f, 0.05f)
+            //        }
+            //    };
+
+            //    model.Rooms[0].Pedestals[0].Sculpture.Shapes.Add(component);
+            //}
 
            string val = JsonConvert.SerializeObject(model);
         }

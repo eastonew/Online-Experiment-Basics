@@ -15,5 +15,8 @@ namespace MainEnvironment.Core
         public PedestalModel[] Pedestals { get; set; }
         public RoomDirectionEnum? Direction { get; set; }
         public int Order { get; set; }
+        public float Width { get; set; }
+        public float Depth { get; set; }
+        public float Height { get; set; }
     }
 }

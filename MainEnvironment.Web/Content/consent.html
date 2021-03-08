@@ -6,32 +6,29 @@
     <style>
         .input {
             padding: 15px;
-            width: 450px;
-            height: 15px;
-            font-size: 15px;
-            margin-left: auto;
-            margin-right: auto;
+            width: 98%;
+            height: 25px;
+            font-size: 25px;
+            margin-left: 0.5vh;
+            margin-right: 0.5vh;
             display: block;
-            color: #FFFFFF;
-            background-color: #6202F7;
-        }
-        ::placeholder
-        {
-            color: #FFFFFF;
+            /*color: #FFFFFF;*/
+            /*background-color: #6202F7;*/
         }
         select {
             padding: 5px;
-            width: 450px;
-            height: 30px;
-            margin-left: auto;
-            margin-right: auto;
+            width: 98%;
+            height: 50px;
+            margin-left: 0.5vh;
+            margin-right: 0.5vh;
             display: block;
-            color: #FFFFFF;
-            background-color: #6202F7;
+            /*color: #FFFFFF;*/
+            /*background-color: #6202F7;*/
+            font-size: 25px;
         }
-            select option {
-                color: black;
-            }
+            /*select option {
+                color: #000000;
+            }*/
 
         .lblClauseText {
             padding: 5px;
@@ -40,14 +37,14 @@
             display: inline-block;
             text-align: left;
             color: #000000;
-            font-size: 15pt;
+            font-size: 25pt;
         }
         .chkAccept {
             padding: 5px;
             position: absolute;
-            width: 30px;
-            height: 30px;
-            right: 5px;
+            width: 50px;
+            height: 50px;
+            right: 3vh;
             display: inline-block;
             color: #000000;
             margin: 0;
@@ -61,18 +58,22 @@
             border: 2px solid red;
         }
         .header {
-            border-bottom: 2px solid #E403FB;
+            /* border-top: 3px solid #6202F7;*/
+            border-bottom: 3px solid #6202F7;
             padding: 10px;
             position: relative;
-            background-color: rgba(228,3,251, 0.7);
-            margin: 0;
+            /* background-color: rgba(228,3,251, 0.7);*/
+            margin-left: 0.5vh;
+            margin-right: 0.5vh;
             margin-bottom: 10px;
             height: 9vh;
+            background-color: rgba(253,38,114,0.2);
         }
         .header h1 {
             width: 100%;
             position: absolute;
             right: 0;
+            font-size: 35pt;
         }
             .header img {
                 height: 11vh;
@@ -90,22 +91,37 @@
         html {
             padding: 0;
             margin: 0;
-            background-color: rgba(253,38,114,0.4);
+            background-color: rgba(253,38,114,0.2);
+        }
+        body {
+            padding: 0;
+            margin: 0;
+            font-family: Arial, Helvetica, sans-serif;
+        }
+
+        .details {
+            width: 50%;
+            background-color: #FFFFFF;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid #6202F7;
+            display: block;
         }
 
         .description {
-            margin-bottom: 50px;
+            margin-left:0.5vh;
+            margin-right:0.5vh;
+            padding: 20px;
+            border-bottom: 3px solid #6202F7;
         }
 
         .participant-id-form {
-            width: 80%;
             display: block;
             margin-left: auto;
             margin-right: auto;
-            background-color: #9E65F8;
+            /*background-color: #9E65F8;*/
             text-align: center;
-            margin-top: 50px;
-            border: 2px solid #E403FB;
+            /*border-top: 3px solid #E403FB;*/
             color: #000000;
             padding-bottom: 20px;
             margin-bottom: 40px;
@@ -113,13 +129,11 @@
 
 
         .participant-id, .complete-button, .headset-type, .clause {
-            border-top: 2px solid #4B0052;
-            border-left: 2px solid #4B0052;
-            border-right: 2px solid #4B0052;
+            border-bottom: 3px double #6202F7;
             padding: 2vh;
-            width: 650px;
-            margin-left: auto;
-            margin-right: auto;
+            /*width: 650px;*/
+            margin-left: 0.5vh;
+            margin-right: 0.5vh;
             position: relative;
         }
         .clause
@@ -129,22 +143,27 @@
             
         }
         .complete-button {
-            border-bottom: 2px solid #4B0052;
+            border-bottom: 3px double #6202F7;
+            height: 60px;
         }
 
         .submit-button, .submit-consent-button {
-            width: 250px;
+            width: 450px;
             background-color: #E50051;
-            height: 30px;
+            height: 50px;
             vertical-align: middle;
-            position: relative;
-            display: block;
-            margin-right: auto;
-            margin-left: auto;
+            position: absolute;
+            right: 2vh;
             padding: 5px;
             cursor: pointer;
             user-select: none;
         }
+            .submit-button span {
+                width: 440px;
+                height: 40px;
+                vertical-align: middle;
+                display: table-cell;
+            }
 
             .submit-button:hover {
                 background-color: #6E0027;
@@ -289,10 +308,10 @@
         </div>
         <div class="form">
             <div class="description">
-                <span>Welcome this portal will allow you to consent to the Measuring Symmetry Preference by Age experiment and recieve the instructions for download.</span>
+                <span>Welcome, this portal will allow you to consent to the Measuring Symmetry Preference by Age experiment and recieve the instructions to download the environment.</span>
                 <br />
                 <br />
-                <span>Please begin by entering your participant Id below</span>
+                <span>Please begin by entering your participant ID below</span>
             </div>
             <div class="participant-id">
                 <div class="user-message">
