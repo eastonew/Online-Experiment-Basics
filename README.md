@@ -1,5 +1,5 @@
 # Online-Experiment-Basics
-This is a basic system which currently is designed to work in unison with online platforms such as Prolific,  allowing the management of participants and storing of log details
+This is a basic system which currently is designed to work in unison with online platforms such as Prolific,  allowing the management of participants and storing of log details.  I have also added some basic interaction scripts to help control the user within Virtual Reality.  This includes flying, by using the controller either as a thruster or pointing in the direction the user wants to go; grabbing objects to indicate an item is being grabbed by a user; translating a grabbed object based on the controller position; rotating a grabbed object and scaling the user down to a specified size and placing on a specified point.
 
 **In order to set up this project to work the following steps needs to be followed:  (this process will generally need to be completed on each pull)**
 
@@ -22,5 +22,6 @@ This is a basic system which currently is designed to work in unison with online
 8.Update the method to have the async signature e.g. public async void MethodName()
 9. Add the await keyword when calling into the required method of the Api service
 * N.B. Be careful this is not done in Unity's Update method (or make sure to handle appropriately)
+10. To add the interaction method scripts, these can be copied directly into your scripts folder.  They have a dependency on the SteamVR package, so this needs to be installed.
 
 **Please look at the ConsoleTest Project for examples on how to potentially create an experiment definition / configuration file (although this will need work)**
