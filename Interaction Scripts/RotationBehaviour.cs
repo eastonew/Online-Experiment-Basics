@@ -70,11 +70,11 @@ public class RotationBehaviour : MonoBehaviour
         var currentRot = this.transform.rotation;
         if (rotateRight)
         {
-            this.transform.rotation = currentRot * Quaternion.Euler(0, 90, 0);
+            this.transform.rotation = currentRot * Quaternion.Euler(RotationAngle);
         }
         else
         {
-            this.transform.rotation = currentRot * Quaternion.Euler(0, -90, 0);
+            this.transform.rotation = currentRot * Quaternion.Euler(RotationAngle * -1);
         }
     }
 }
