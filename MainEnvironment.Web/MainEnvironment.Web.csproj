@@ -6,11 +6,15 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="Content\483DD908-A5BE-4DD4-A7F7-9BF042907156\vive.zip" />
     <None Remove="Content\aston-logo.svg" />
     <None Remove="Content\consent.html" />
   </ItemGroup>
 
   <ItemGroup>
+    <Content Include="Content\483DD908-A5BE-4DD4-A7F7-9BF042907156\vive.zip">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Content\aston-logo.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>

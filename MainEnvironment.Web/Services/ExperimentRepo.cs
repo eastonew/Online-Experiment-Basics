@@ -24,7 +24,8 @@ namespace MainEnvironment.Web.Services
         {
             SceneModel details = null;
             //if a participant has a key assigned they have tried the experiment before
-            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && p.ConsentFormAccepted && (p.ApiKey == null || p.KeyExpirationDate > DateTime.UtcNow));
+            //They can attempt the experiment as many times as they like until they complete it, but only have a specified time limit to do so, otherwise they need to restart
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && p.ConsentFormAccepted);
             if(participant != null && participant.ExperimentId != null)
             {
                 //if the participant has any existing logs - delete these out of the database 
@@ -51,7 +52,7 @@ namespace MainEnvironment.Web.Services
                     Guid key = Guid.NewGuid();
                     details.ApiKey = key.ToString();
                     participant.ApiKey = details.ApiKey;
-                    participant.KeyExpirationDate = DateTime.UtcNow.AddMinutes(40); //as part of the rules once they have started they will need to 
+                    participant.KeyExpirationDate = DateTime.UtcNow.AddDays(5); // DateTime.UtcNow.AddMinutes(40); //as part of the rules once they have started they will need to 
                     Context.Update(participant);
                     await this.Context.SaveChangesAsync();
                     //what happens if they start and don't finish and then try to come back?
@@ -114,6 +115,11 @@ namespace MainEnvironment.Web.Services
             return participant;
         }
 
+        public async Task<Participant> GetParticipantDetails(Guid participantId)
+        {
+            return await this.Context.Participants.SingleOrDefaultAsync(p => p.Id == participantId);
+        }
+
         public async Task<bool> CompleteExperiment(string participantId, string key)
         {
             bool success = true;
@@ -133,6 +139,20 @@ namespace MainEnvironment.Web.Services
             catch
             {
                 success = false;
+            }
+            return success;
+        }
+
+        public async Task<bool> MarkAsDownloaded(Guid participantId)
+        {
+            bool success = false;
+            var participant = await this.GetParticipantDetails(participantId);
+            if (participant != null)
+            {
+                participant.DownloadedEnvironment = true;
+                participant.DownloadToken = null;
+                await this.Context.SaveChangesAsync();
+                success = true;
             }
             return success;
         }

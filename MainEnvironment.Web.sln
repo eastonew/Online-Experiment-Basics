@@ -3,13 +3,15 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.30523.141
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainEnvironment.Web", "MainEnvironment.Web\MainEnvironment.Web.csproj", "{06554230-FD78-4637-B95C-1E038DF61869}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainEnvironment.Web", "MainEnvironment.Web\MainEnvironment.Web.csproj", "{06554230-FD78-4637-B95C-1E038DF61869}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainEnvironment.Core", "MainEnvironment.Core\MainEnvironment.Core.csproj", "{45985FB0-3AC0-4290-81B4-82297AD95098}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainEnvironment.Core", "MainEnvironment.Core\MainEnvironment.Core.csproj", "{45985FB0-3AC0-4290-81B4-82297AD95098}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainEnvironment.Database", "MainEnvironment.Database\MainEnvironment.Database.csproj", "{E94EAE03-37A5-4FCD-9EF5-7A2D1DBE5BCF}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainEnvironment.Database", "MainEnvironment.Database\MainEnvironment.Database.csproj", "{E94EAE03-37A5-4FCD-9EF5-7A2D1DBE5BCF}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainEnvironment.ConsoleTest", "MainEnvironment.ConsoleTest\MainEnvironment.ConsoleTest.csproj", "{1B6CF1F1-F7CF-4FC7-823A-F9A9CB1C8DAD}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MainEnvironment.ConsoleTest", "MainEnvironment.ConsoleTest\MainEnvironment.ConsoleTest.csproj", "{1B6CF1F1-F7CF-4FC7-823A-F9A9CB1C8DAD}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MainEnvironment.TestCore", "MainEnvironment.TestCore\MainEnvironment.TestCore.csproj", "{724CB569-5C44-468C-AA26-7A154629C377}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{1B6CF1F1-F7CF-4FC7-823A-F9A9CB1C8DAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1B6CF1F1-F7CF-4FC7-823A-F9A9CB1C8DAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1B6CF1F1-F7CF-4FC7-823A-F9A9CB1C8DAD}.Release|Any CPU.Build.0 = Release|Any CPU
+		{724CB569-5C44-468C-AA26-7A154629C377}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{724CB569-5C44-468C-AA26-7A154629C377}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{724CB569-5C44-468C-AA26-7A154629C377}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{724CB569-5C44-468C-AA26-7A154629C377}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

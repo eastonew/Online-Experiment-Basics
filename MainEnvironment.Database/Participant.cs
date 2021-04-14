@@ -18,5 +18,7 @@ namespace MainEnvironment.Database
         public bool ConsentFormAccepted { get; set; }
         public DateTime? ConsentFormAcceptedDate { get; set; }
         public EquipmentTypeEnum EquipmentType { get; set; }
+        public bool DownloadedEnvironment { get; set; }
+        public Guid? DownloadToken { get; set; }
     }
 }

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace MainEnvironment.Web.Services
@@ -29,6 +30,24 @@ namespace MainEnvironment.Web.Services
                 {
                     model = new DownloadInstructionsModel();
                     model.Instructions = instructions.Instructions;
+
+                    if (model.Instructions.Contains("{{DownloadLink}}"))
+                    {
+                        //if we request the download link token in the instructions it needs to be built here (ideally elsewhere but who really cares
+                        //download token is just a guid -- ideally it would be a crypto secure string
+                        participantDetails.DownloadToken = Guid.NewGuid();
+                        await this.Context.SaveChangesAsync();
+
+                        StringBuilder sb = new StringBuilder();
+                        sb.Append("https://experimentapi.azurewebsites.net/api/download/vive/");
+                        sb.Append(participantDetails.ExperimentId.ToString());
+                        sb.Append("/");
+                        sb.Append(participantDetails.Id.ToString());
+                        sb.Append("/");
+                        sb.Append(participantDetails.DownloadToken);
+                        model.Instructions = model.Instructions.Replace("{{DownloadLink}}", sb.ToString());
+                    }
+
                 }
             }
             return model;

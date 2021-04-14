@@ -16,10 +16,12 @@ namespace MainEnvironment.Web.Controllers
     public class DownloadController : ControllerBase
     {
         private readonly IConsentFormService ConsentService;
+        private readonly IDownloadAppService DownloadService;
 
-        public DownloadController(IConsentFormService consentService)
+        public DownloadController(IConsentFormService consentService, IDownloadAppService appDownloadService)
         {
             this.ConsentService = consentService;
+            this.DownloadService = appDownloadService;
         }
         public IActionResult Get()
         {
@@ -49,6 +51,21 @@ namespace MainEnvironment.Web.Controllers
             }
 
             return StatusCode((int)HttpStatusCode.OK, downloadInstructions);
+        }
+
+        [HttpGet("Vive/{experimentId}/{participantId}/{downloadToken}")]
+        public async Task<IActionResult> DownloadViveEnvironment(Guid experimentId, Guid participantId, Guid downloadToken)
+        {
+            var isValid = await this.DownloadService.CheckIfUserCanDownload(experimentId, participantId, downloadToken);
+            if (isValid)
+            {
+                var bytes = System.IO.File.ReadAllBytes($"content/{experimentId}/vive.zip");
+                return File(bytes, "application/zip", "ViveEnvironment.zip");
+            }
+            else
+            {
+                return StatusCode((int)HttpStatusCode.BadRequest);
+            }
         }
     }
 }

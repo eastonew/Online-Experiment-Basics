@@ -1,6 +1,7 @@
 ﻿using MainEnvironment.Core;
 using MainEnvironment.Core.Enums;
 using MainEnvironment.Core.Models;
+using MainEnvironment.Database;
 using System;
 using System.Collections.Generic;
 using System.Text;
@@ -15,5 +16,7 @@ namespace MainEnvironment.Web.Interfaces
         Task<bool> UpdateParticipantEquipment(string participantId, EquipmentTypeEnum equipment);
         Task<ParticipantModel> MarkConsentFormAsAccepted(string participantId);
         Task<ConsentFormModel> GetConsentForm(string participantId);
+        Task<Participant> GetParticipantDetails(Guid participantId);
+        Task<bool> MarkAsDownloaded(Guid participantId);
     }
 }

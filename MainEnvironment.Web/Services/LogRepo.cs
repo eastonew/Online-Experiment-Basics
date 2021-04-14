@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -47,6 +48,19 @@ namespace MainEnvironment.Web.Services
                 success = false;
             }
             return success;
+        }
+
+        public async Task<List<Log>> GetLogsForParticipant(Guid participantId)
+        {
+            List<Log> logs = null;
+            try
+            {
+                logs = await Context.Logs.Where(l => l.ParticipantId == participantId).ToListAsync();
+            }
+            catch
+            {
+            }
+            return logs;
         }
     }
 }
