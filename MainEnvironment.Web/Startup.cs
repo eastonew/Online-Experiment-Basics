@@ -2,6 +2,8 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using MainEnvironment.Core.Interfaces;
+using MainEnvironment.Core.Models;
 using MainEnvironment.Database;
 using MainEnvironment.Web.Interfaces;
 using MainEnvironment.Web.Services;
@@ -29,7 +31,10 @@ namespace MainEnvironment.Web
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            services.AddControllers().AddNewtonsoftJson();
+            services.AddControllers().AddNewtonsoftJson(s=>
+            {
+                s.SerializerSettings.Converters.Add(new AbstractTypeConverter<ILogModel, LogModel>());
+            });
 
             services.AddTransient<IExperimentRepo, ExperimentRepo>();
             services.AddTransient<ILogRepo, LogRepo>();

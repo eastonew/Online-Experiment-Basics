@@ -7,9 +7,11 @@ namespace MainEnvironment.Core.Enums
     [Flags]
     public enum ActionEnum
     {
-        Translation = 0,
-        RotationX = 1,
-        RotationY = 2,
-        RotationZ = 4,
+        Translation = 1,
+        RotationX = 2,
+        RotationY = 4,
+        RotationZ = 8,
+        Flying = 16,
+        UserScaling = 32
     }
 }

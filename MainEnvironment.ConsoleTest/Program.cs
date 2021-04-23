@@ -1,5 +1,8 @@
 ﻿using MainEnvironment.Core;
 using MainEnvironment.Core.Enums;
+using MainEnvironment.Core.Models;
+using MainEnvironment.Database;
+using MainEnvironment.Web.Services;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -15,19 +18,33 @@ namespace MainEnvironment.ConsoleTest
         {
             SceneModel model = new SceneModel()
             {
-                Questionnaire = new QuestionnaireModel()
+                AvailableActions = ActionEnum.Translation | ActionEnum.RotationY | ActionEnum.Flying | ActionEnum.UserScaling,
+                AllTags = new TagModel[]
                 {
-                    Questions = new QuestionModel[]
-                    {
-                        new QuestionModel()
-                        {
-                            QuestionType = QuestionModel.QuestionTypeEnum.TrueFalse,
-                            FalseAnswerText = "No",
-                            TrueAnswerText = "Yes",
-                            Prefix = "Can you see this question?",
-                        }
-                    }
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 1" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 2" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 3" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 4" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 5" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 6" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 7" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 8" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 9" },
+                    new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 10" },
                 },
+                //Questionnaire = new QuestionnaireModel()
+                //{
+                //    Questions = new QuestionModel[]
+                //    {
+                //        new QuestionModel()
+                //        {
+                //            QuestionType = QuestionModel.QuestionTypeEnum.TrueFalse,
+                //            FalseAnswerText = "No",
+                //            TrueAnswerText = "Yes",
+                //            Prefix = "Can you see this question?",
+                //        }
+                //    }
+                //},
                 Rooms = new RoomModel[1]
                 {
                     new RoomModel()
@@ -62,8 +79,7 @@ namespace MainEnvironment.ConsoleTest
                                   BaseShape = ShapeModel.ShapeModelBaseEnum.Sphere,
                                   Scale = new Vector3(0.05f, 0.05f, 0.05f)
                               }
-                        }).ToList(),
-                        AvailableActions = ActionEnum.Translation & ActionEnum.RotationY
+                        }).ToList()
                     }
                 };
             }

@@ -1,11 +1,12 @@
-﻿using System;
+﻿using MainEnvironment.Core.Interfaces;
+using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace MainEnvironment.Core.Models
 {
-    public class LogRequest
+    public class LogRequest : ILogRequest
     {
-        public List<LogModel> Logs { get; set; }
+        public List<ILogModel> Logs { get; set; }
     }
 }
