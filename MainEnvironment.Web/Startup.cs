@@ -42,6 +42,7 @@ namespace MainEnvironment.Web
             services.AddTransient<IConsentFormService, ConsentFormService>();
             services.AddTransient<ILeanLogService, LeanLogService>();
             services.AddTransient<IDownloadAppService, DownloadAppService>();
+            services.AddTransient<IDataAnalysisLogService, DataAnalysisLogService>();
 
             services.AddDbContext<EnvironmentContext>(s => s.UseSqlServer(Configuration.GetConnectionString("ConnectionString"), options =>
             {

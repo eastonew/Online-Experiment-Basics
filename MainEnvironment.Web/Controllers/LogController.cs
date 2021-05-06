@@ -16,17 +16,25 @@ namespace MainEnvironment.Web.Controllers
     {
         private readonly ILogRepo LogRepo;
         private readonly ILeanLogService LeanLogService;
+        private readonly IDataAnalysisLogService AnalysisLogService;
 
-        public LogController(ILogRepo logRepo, ILeanLogService leanLogService)
+        public LogController(ILogRepo logRepo, ILeanLogService leanLogService, IDataAnalysisLogService analysisLogService)
         {
             this.LogRepo = logRepo;
             this.LeanLogService = leanLogService;
+            this.AnalysisLogService = analysisLogService;
         }
-
-        [HttpGet]
+        
+        [HttpGet("Lean/{participantId}")]
         public async Task<ActionResult> Get(Guid participantId)
         {
             return StatusCode(200, await this.LeanLogService.GetLeanDataForParticipant(participantId));
+        }
+
+        [HttpGet("Analysis/{participantId}")]
+        public async Task<ActionResult> GetAnalysis(Guid participantId)
+        {
+            return StatusCode(200, await this.AnalysisLogService.GetDataForParticipant(participantId));
         }
 
         [HttpPost]
@@ -47,13 +55,15 @@ namespace MainEnvironment.Web.Controllers
         public async Task<ActionResult> BulkAdd(LogRequest logs)
         {
             bool success = true;
-            foreach (var log in logs.Logs)
+            if (logs?.Logs != null)
             {
-                var logSuccess = await this.LogRepo.AddLog(log);
-                success &= logSuccess;
+                foreach (var log in logs?.Logs)
+                {
+                    var logSuccess = await this.LogRepo.AddLog(log);
+                    success &= logSuccess;
+                }
             }
-
-            if (success)
+                if (success)
             {
                 return StatusCode((int)HttpStatusCode.Created);
             }
