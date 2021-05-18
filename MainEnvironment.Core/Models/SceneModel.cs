@@ -11,5 +11,6 @@ namespace MainEnvironment.Core
         //public QuestionnaireModel Questionnaire { get; set; }
         public ActionEnum AvailableActions { get; set; }
         public TagModel[] AllTags { get; set; }
+        public string ErrorMessage { get; set; }
     }
 }

@@ -22,41 +22,63 @@ namespace MainEnvironment.Web.Services
         }
         public async Task<SceneModel> GetExperimentDetails(string participantId)
         {
-            SceneModel details = null;
+            SceneModel details = new SceneModel();
             //if a participant has a key assigned they have tried the experiment before
             //They can attempt the experiment as many times as they like until they complete it, but only have a specified time limit to do so, otherwise they need to restart
-            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && p.ConsentFormAccepted);
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId);
             if(participant != null && participant.ExperimentId != null)
             {
-                //if the participant has any existing logs - delete these out of the database 
-                var existingLogs = await Context.Logs.Where(l => l.ParticipantId == participant.Id).ToListAsync();
-                foreach (var log in existingLogs)
+                if (!participant.Completed && participant.ConsentFormAccepted)
                 {
-                    Context.Remove(log);
-                }
-                await this.Context.SaveChangesAsync();
-
-                var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == participant.ExperimentId && e.IsLive);
-                if(experiment != null)
-                {
-                    if (experiment.ExperimentDefinition != null)
+                    //if the participant has any existing logs - delete these out of the database 
+                    var existingLogs = await Context.Logs.Where(l => l.ParticipantId == participant.Id).ToListAsync();
+                    foreach (var log in existingLogs)
                     {
-                        details = JsonConvert.DeserializeObject<SceneModel>(experiment.ExperimentDefinition);
+                        Context.Remove(log);
+                    }
+                    await this.Context.SaveChangesAsync();
+
+                    var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == participant.ExperimentId && e.IsLive);
+                    if (experiment != null)
+                    {
+                        if (experiment.ExperimentDefinition != null)
+                        {
+                            details = JsonConvert.DeserializeObject<SceneModel>(experiment.ExperimentDefinition);
+                        }
+                        else
+                        {
+                            details = new SceneModel();
+                        }
+
+                        //ideally this will be a cryptographically secure key but for now just send a unique Guid
+                        Guid key = Guid.NewGuid();
+                        details.ApiKey = key.ToString();
+                        participant.ApiKey = details.ApiKey;
+                        participant.KeyExpirationDate = DateTime.UtcNow.AddDays(5); // DateTime.UtcNow.AddMinutes(40); //as part of the rules once they have started they will need to 
+                        Context.Update(participant);
+                        await this.Context.SaveChangesAsync();
+                        //what happens if they start and don't finish and then try to come back?
+                    }
+                }
+                else
+                {
+                    if(participant.Completed)
+                    {
+                        details.ErrorMessage = "AlreadyCompleted";
+                    }
+                    else if(!participant.ConsentFormAccepted)
+                    {
+                        details.ErrorMessage = "ConsentNotAccepted";
                     }
                     else
                     {
-                        details = new SceneModel();
+                        details.ErrorMessage = "Unknown";
                     }
-                   
-                    //ideally this will be a cryptographically secure key but for now just send a unique Guid
-                    Guid key = Guid.NewGuid();
-                    details.ApiKey = key.ToString();
-                    participant.ApiKey = details.ApiKey;
-                    participant.KeyExpirationDate = DateTime.UtcNow.AddDays(5); // DateTime.UtcNow.AddMinutes(40); //as part of the rules once they have started they will need to 
-                    Context.Update(participant);
-                    await this.Context.SaveChangesAsync();
-                    //what happens if they start and don't finish and then try to come back?
                 }
+            }
+            else
+            {
+                details.ErrorMessage = "CannotFind";
             }
             return details;
         }
