@@ -350,3 +350,5 @@ MigrationBackup/
 .ionide/
 /MainEnvironment.Web/Content/483DD908-A5BE-4DD4-A7F7-9BF042907156/vive.zip
 /MainEnvironment.Web/Properties
+
+MainEnvironment.Web/appsettings.Development.json
