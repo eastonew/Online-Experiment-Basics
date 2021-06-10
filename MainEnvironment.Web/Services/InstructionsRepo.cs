@@ -19,13 +19,13 @@ namespace MainEnvironment.Web.Services
             this.Context = context;
         }
 
-        public async Task<DownloadInstructionsModel> GetInstructionsForParticipant(ParticipantModel participant)
+        public async Task<DownloadInstructionsModel> GetInstallInstructionsForParticipant(ParticipantModel participant)
         {
             DownloadInstructionsModel model = null;
             var participantDetails = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participant.ParticipantId && !p.Completed && p.ConsentFormAccepted);
             if (participantDetails != null && participantDetails.ExperimentId != null)
             {
-                var instructions = await this.Context.DownloadInstructions.SingleOrDefaultAsync(i => i.ExperimentId == participantDetails.ExperimentId && i.EquimentType == participantDetails.EquipmentType);
+                var instructions = await this.Context.DownloadInstructions.SingleOrDefaultAsync(i => i.ExperimentId == participantDetails.ExperimentId && i.EquimentType == participantDetails.EquipmentType && i.InstructionsType == InstructionsTypeEnum.Install);
                 if (instructions != null)
                 {
                     model = new DownloadInstructionsModel();
@@ -48,6 +48,22 @@ namespace MainEnvironment.Web.Services
                         model.Instructions = model.Instructions.Replace("{{DownloadLink}}", sb.ToString());
                     }
 
+                }
+            }
+            return model;
+        }
+
+        public async Task<DownloadInstructionsModel> GetUninstallInstructionsForParticipant(ParticipantModel participant)
+        {
+            DownloadInstructionsModel model = null;
+            var participantDetails = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participant.ParticipantId && p.Completed && p.ConsentFormAccepted);
+            if (participantDetails != null && participantDetails.ExperimentId != null)
+            {
+                var instructions = await this.Context.DownloadInstructions.SingleOrDefaultAsync(i => i.ExperimentId == participantDetails.ExperimentId && i.EquimentType == participantDetails.EquipmentType && i.InstructionsType == InstructionsTypeEnum.Uninstall);
+                if (instructions != null)
+                {
+                    model = new DownloadInstructionsModel();
+                    model.Instructions = instructions.Instructions;
                 }
             }
             return model;

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk.Web">
+﻿<Project Sdk="Microsoft.NET.Sdk.Web">
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
@@ -8,6 +8,7 @@
   <ItemGroup>
     <None Remove="Content\483DD908-A5BE-4DD4-A7F7-9BF042907156\vive.zip" />
     <None Remove="Content\aston-logo.svg" />
+    <None Remove="Content\complete.html" />
     <None Remove="Content\consent.html" />
   </ItemGroup>
 
@@ -17,6 +18,9 @@
     </Content>
     <Content Include="Content\aston-logo.svg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Content\complete.html">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Content\consent.html">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

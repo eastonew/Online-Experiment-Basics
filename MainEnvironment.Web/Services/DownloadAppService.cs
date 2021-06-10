@@ -1,4 +1,5 @@
-﻿using MainEnvironment.Web.Interfaces;
+﻿using MainEnvironment.Core.Models;
+using MainEnvironment.Web.Interfaces;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,10 +11,12 @@ namespace MainEnvironment.Web.Services
     {
 
         private readonly IExperimentRepo ExperimentRepo;
+        private readonly IInstructionsRepo InstructionsRepo;
 
-        public DownloadAppService(IExperimentRepo repo)
+        public DownloadAppService(IExperimentRepo repo, IInstructionsRepo instructionsRepo)
         {
             this.ExperimentRepo = repo;
+            this.InstructionsRepo = instructionsRepo;
         }
 
         public async Task<bool> CheckIfUserCanDownload(Guid experimentId, Guid participantId, Guid downloadToken)
@@ -32,6 +35,12 @@ namespace MainEnvironment.Web.Services
                 }
             }
             return isValid;
+        }
+
+        public async Task<DownloadInstructionsModel> GetCompletionInstructions(ParticipantModel participant)
+        {
+            var instructions = await this.InstructionsRepo.GetUninstallInstructionsForParticipant(participant);
+            return instructions;
         }
     }
 }

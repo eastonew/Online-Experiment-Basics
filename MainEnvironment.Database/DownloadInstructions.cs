@@ -11,7 +11,8 @@ namespace MainEnvironment.Database
         public Guid ExperimentId { get; set; }
         public EquipmentTypeEnum EquimentType { get; set; }
         public string Instructions { get; set; }
-
+        public InstructionsTypeEnum InstructionsType { get; set; }
         public virtual Experiment ExperimentDetails { get; set; }
+
     }
 }

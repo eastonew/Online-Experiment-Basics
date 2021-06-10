@@ -15,6 +15,7 @@
             /*color: #FFFFFF;*/
             /*background-color: #6202F7;*/
         }
+
         select {
             padding: 5px;
             width: 98%;
@@ -26,7 +27,7 @@
             /*background-color: #6202F7;*/
             font-size: 25px;
         }
-            /*select option {
+        /*select option {
                 color: #000000;
             }*/
 
@@ -39,6 +40,7 @@
             color: #000000;
             font-size: 25px;
         }
+
         .chkAccept {
             padding: 5px;
             position: absolute;
@@ -51,12 +53,15 @@
             top: 50%;
             transform: translateY(-50%);
         }
-        .input.error{
+
+        .input.error {
             border: 2px solid red;
         }
+
         select.error {
             border: 2px solid red;
         }
+
         .header {
             /* border-top: 3px solid #6202F7;*/
             border-bottom: 3px solid #6202F7;
@@ -69,16 +74,18 @@
             background-color: rgba(28,14,82, 0.5);
             /*background-color: rgba(253,38,114,0.2);*/
         }
+
         h1 {
             width: 100%;
             font-size: 35pt;
         }
-            img {
-                height: 15vh;
-                position: absolute;
-                left:3vw;
-                top: 2vh;
-            }
+
+        img {
+            height: 15vh;
+            position: absolute;
+            left: 3vw;
+            top: 2vh;
+        }
 
         span {
             padding: 5px;
@@ -91,6 +98,7 @@
             padding: 0;
             margin: 0;
         }
+
         body {
             padding: 0;
             margin: 0;
@@ -108,8 +116,8 @@
         }
 
         .description {
-            margin-left:0.5vh;
-            margin-right:0.5vh;
+            margin-left: 0.5vh;
+            margin-right: 0.5vh;
             padding: 20px;
             border-bottom: 3px solid #6202F7;
         }
@@ -132,18 +140,19 @@
             margin-right: 0.5vh;
             position: relative;
         }
-        .clause
-        {
+
+        .clause {
             min-height: 70px;
-            text-align:left;
-            
+            text-align: left;
         }
+
         .complete-button {
             padding: 2vh;
             margin-left: 0.5vh;
             margin-right: 0.5vh;
             background-color: rgba(28,14,82, 0.5);
         }
+
             .complete-button h1 {
                 margin: 0;
                 font-size: 15pt;
@@ -157,18 +166,19 @@
             max-height: 50px;
             background-color: #483983;
             color: #FFFFFF;
-           /* position: absolute;
+            /* position: absolute;
             top: 1.5vw;
             right: 2vw;*/
             padding: 1vw;
             cursor: pointer;
-            display:block;
+            display: block;
             user-select: none;
         }
 
             .submit-button:hover, .submit-consent-button:hover {
                 background-color: #31216C;
             }
+
         .user-message {
             display: none;
             z-index: 5;
@@ -181,6 +191,7 @@
             position: absolute;
             background-color: rgba(7,1,30, 0.8);
         }
+
             .user-message .message {
                 position: absolute;
                 margin: 0;
@@ -189,14 +200,13 @@
                 color: #FFFFFF;
                 left: 50%;
             }
-        .headset-type span
-        {
-            width:100%;
+
+        .headset-type span {
+            width: 100%;
             font-size: 25px;
             display: block;
-            margin-top:-10px;
+            margin-top: -10px;
         }
-
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
@@ -204,9 +214,8 @@
 
             $(".submit-button").on("click", function () {
                 var id = $(".input").val();
-                var equipment = $("#ddlHeadset").val();
-                
-                if (!id || !equipment) {
+
+                if (!id) {
                     if (!id) {
                         $(".input").addClass("error");
                         $(".participant-id .user-message .message").text("Please enter a value to continue");
@@ -215,96 +224,29 @@
                             $(".participant-id .user-message").hide("slow");
                         }, 2000);
                     }
-                    if (!equipment) {
-                        $("#ddlHeadset").addClass("error");
-                        $(".headset-type .user-message .message").text("Please select a value to continue");
-                        $(".headset-type .user-message").show("fast");
-                        setTimeout(function () {
-                            $(".headset-type .user-message").hide("slow");
-                        }, 2000);
-                    }
                 }
                 else {
                     $(".input").removeClass("error");
-                    $("#ddlHeadset").removeClass("error");
                     $.ajax
                         ({
                             type: "POST",
-                            url: "/api/download/getconsentform",
+                            url: "/api/download/GetCompletionDetails",
                             contentType: "application/json",
-                            data: JSON.stringify({ participantId: id, equipmentType: equipment })
+                            data: JSON.stringify({ participantId: id })
                         }).done(function (data) {
                             $(".form").hide();
-                            
-                            if (!data || !data.clauses || !data.clauses.length) {
+
+                            if (!data || !data.instructions) {
                                 $(".error-form").show();
                             }
                             else {
-                                $(".consent-form").show();
-                                $("#hdnParticipantId").val(data.participantId);
-                                $(".main-header").text("Measuring Symmetry Preference by Age Consent");
-                                for (var i = 0; i < data.clauses.length; i++) {
-                                    var clause = data.clauses[i];
-                                    var $clause = $(".consent-form .clause").not(':visible').clone();
-                                    $clause.find(".chkAccept").val(clause.id);
-                                    $clause.find(".lblClauseText").text(clause.clause);
-                                    $clause.show().insertBefore($(".consent-form .complete-button"));
-                                }
+                                $(".instructions").show();
+                                $(".main-header").text("Measuring Symmetry Preference by Age Uninstall Instructions");
+                                $(".details").html(data.instructions);
                             }
                         })
                         .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
                 }
-            });
-
-            $(".submit-consent-button").on("click", function () {
-                var clauses = $(".clause:visible");
-                var consentModel = {
-                    participantId: $("#hdnParticipantId").val(),
-                    clauses: []
-                };
-                var allConfirmed = true;
-                for (var i = 0; i < clauses.length; i++) {
-                    var $clause = $(clauses[i]);
-                    var $chk = $clause.find(".chkAccept");
-                    var accepted = $chk.prop("checked");
-                    allConfirmed &= accepted;
-                    if (accepted) {
-                        var id = $chk.val();
-                        //need to build model and send to server
-                        var clause = {
-                            id: id,
-                            accepted: true,
-                            acceptedDate: new Date().toISOString()
-                        };
-                        consentModel.clauses.push(clause);
-                    }
-                    else {
-                        $chk.addClass("error");
-                        $clause.find(".user-message .message").text("Please confirm you accept this clause");
-                        $clause.find(".user-message").show("fast");
-                        setTimeout(function () {
-                            $(".clause:visible").find(".user-message").hide("slow");
-                        }, 2000);
-                    }
-                }
-
-                if (allConfirmed) {
-                    console.log(JSON.stringify(consentModel));
-                    $.ajax
-                        ({
-                            type: "POST",
-                            url: "/api/download/SubmitConsentForm",
-                            contentType: "application/json",
-                            data: JSON.stringify(consentModel)
-                        }).done(function (data) {
-                            $(".consent-form").hide();
-                            $(".instructions").show();
-                            $(".instructions .details").html(data.instructions);
-                            $(".main-header").text("Measuring Symmetry Preference by Age Download");
-                        })
-                        .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
-                }
-
             });
         });
     </script>
@@ -313,70 +255,36 @@
     <div class="participant-id-form">
         <img id="logo" src="data:image/svg+xml;base64,PHN2ZwogIHZlcnNpb249IjEuMSIKICB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciCiAgcHJlc2VydmVBc3BlY3RSYXRpbz0ibm9uZSIKICB2aWV3Qm94PSIwIDAgNTU3LjA5MDAyIDIzMy42ODk5OSIKICB3aWR0aD0iNTU3LjA5MDAyIgogIGhlaWdodD0iMjMzLjY5Ij4KICA8ZyB0cmFuc2Zvcm09InRyYW5zbGF0ZSgtMTUzLjU5LC0xNTcuMDUpIj4KICAgIDxwb2x5Z29uIHBvaW50cz0iMjU5LjcsMjQ3Ljk2IDM0MC42MiwxNTcuMDUgMTcwLjE2LDE4OC4yNSIKICAgICAgICAgICAgIHN0eWxlPSJmaWxsOiM4MzAwOGYiLz4KICAgIDxnPgogICAgICA8cGF0aAogICAgICAgIGQ9Im0gNjYyLjQ2LDI5OS43NCBjIDMuMDEsMCA1LjQ1LC0wLjg4IDguMDMsLTIuMzggdiA1LjUxIGMgLTIuNjQsMS41MSAtNi4wMiwyLjM1IC04LjkyLDIuMzUgLTcuNTMsMCAtMTIuMTksLTQuMjcgLTEyLjE5LC0xMS43MiB2IC0yMS43NiBoIC02LjExIGwgMTMuMjMsLTE0LjgxIHYgOS4yNCBoIDEyLjAzIHYgNS41NyBIIDY1Ni41IHYgMjEuMzUgYyAtMC4wMSw0Ljg5IDIuOTUsNi42NSA1Ljk2LDYuNjUiCiAgICAgIC8+CiAgICAgIDxwYXRoCiAgICAgICAgZD0ibSA0MjAuMDIsMjQ4LjAxIHYgMzQuNDQgYyAwLDcuMyAtMS44MiwxMy4xMyAtNi4wMiwxNy4zNSB2IDAuMDEgYyAtMy42MywzLjcgLTkuNDgsNS43NCAtMTYuNzcsNS43NCAtNy40MSwwIC0xMy4zMSwtMi4wNCAtMTYuOTMsLTUuNzQgLTQuMTUsLTQuMTcgLTUuOTQsLTkuOTkgLTUuOTQsLTE3LjM1IFYgMjYwLjUgYyAwLC02LjM1IC0wLjM0LC0xMC42NCAtNC40LC0xMi4xNyB2IC0wLjMxIGggMTIuNDIgdiAzNC40NCBjIDAsNS42NyAxLjEyLDkuOTcgMy45MywxMi43OCAyLjY2LDIuNjcgNi4zOCw0LjA5IDExLjA4LDQuMDkgNC41OSwwIDguMzgsLTEuNDYgMTEuMDEsLTQuMDkgMi44MSwtMi44MSAzLjkzLC03LjExIDMuOTMsLTEyLjc4IHYgLTM0LjQ0IGggNy42OSB6IgogICAgICAvPgogICAgICA8cGF0aAogICAgICAgIGQ9Im0gNDMwLjg1LDI3NC43MiBjIDAsLTMuNzkgLTAuMzMsLTcuMDIgLTMuOTksLTguMjcgdiAtMC4yOSBoIDEwLjY1IGwgMC4xOSw1Ljk1IGMgMy43NSwtNS44NiA5LjExLC02LjkzIDEzLjA0LC02LjkzIDIuOTYsMCAxMi41OSwxLjA0IDEyLjU5LDE0LjQ4IHYgMjQuNTYgaCAtNy4yIHYgLTI0LjY0IGMgMCwtNS41OCAtMywtOC45MSAtOC4wMiwtOC45MSAtMy45LDAgLTcuNjQsMi40OSAtMTAuMDUsNi43NCB2IDI2LjgxIGggLTcuMiB2IC0yOS41IgogICAgICAvPgogICAgICA8cGF0aAogICAgICAgIGQ9Im0gNDgxLjQyLDI2Ni4xNyB2IDM4LjA2IGggLTcuMiB2IC0yOS41IGMgMCwtMy43OSAtMC4zMywtNy4wMiAtMy45OCwtOC4yNyB2IC0wLjI5IHoiCiAgICAgIC8+CiAgICAgIDxwYXRoCiAgICAgICAgZD0ibSA0NzIuOCwyNTMgYyAwLC0yLjQ2IDIuMDEsLTQuNDcgNC40OCwtNC40NyAyLjUxLDAgNC41NSwyLjAxIDQuNTUsNC40NyAwLDIuNTUgLTIsNC41NSAtNC41NSw0LjU1IC0yLjQ4LDAgLTQuNDgsLTIuMDQgLTQuNDgsLTQuNTUiCiAgICAgIC8+CiAgICAgIDxwYXRoCiAgICAgICAgZD0ibSA2MzcuMzcsMjY2LjE3IHYgMzguMDYgaCAtNy4yIHYgLTI5LjUgYyAwLC0zLjc5IC0wLjMzLC03LjAyIC0zLjk5LC04LjI3IHYgLTAuMjkgeiIKICAgICAgLz4KICAgICAgPHBhdGgKICAgICAgICBkPSJtIDYyOC43NCwyNTMgYyAwLC0yLjQ2IDIuMDEsLTQuNDcgNC40OCwtNC40NyAyLjUxLDAgNC41NSwyLjAxIDQuNTUsNC40NyAwLDIuNTUgLTIsNC41NSAtNC41NSw0LjU1IC0yLjQ3LDAgLTQuNDgsLTIuMDQgLTQuNDgsLTQuNTUiCiAgICAgIC8+CiAgICAgIDxwYXRoCiAgICAgICAgZD0ibSA1MjMuMzgsMjY2LjE3IC0xNi40NSwzOC4yMyBoIC0yLjQ1IGwgLTEzLjU5LC0zMC4xNyBjIC0xLjU1LC0zLjQyIC0zLjI4LC02Ljc5IC01Ljg2LC03Ljc2IHYgLTAuMyBoIDkuOTkgbCA4Ljg0LDIwLjcxIGMgMC40NiwxLjA3IDEuNTksMy43MiAyLjIsNi4wNiAwLjU0LC0yLjM1IDEuNDUsLTQuNzIgMiwtNi4wNSBsIDguMjMsLTIwLjcyIHoiCiAgICAgIC8+CiAgICAgIDxwYXRoCiAgICAgICAgZD0ibSA1MzMuMTgsMjgxLjIyIGggMjAuNTkgYyAtMC40NSwtNi43MSAtNC4xMiwtMTAuNjMgLTkuOTUsLTEwLjYzIC01LjYzLDAgLTkuODMsNC4wOSAtMTAuNjQsMTAuNjMgbSAtMC4yNyw0Ljc1IGMgMC41NCw4LjA5IDUuNTQsMTIuODYgMTIuMTgsMTMuNDQgNS4zMiwwLjQ2IDkuNzgsLTAuOCAxMy41LC0yLjk1IGwgMC45LDUuMzcgYyAtMy44NywyLjI5IC04LjY2LDMuMzkgLTE0LjI3LDMuMzkgLTExLjYxLDAgLTE5LjcxLC04LjIzIC0xOS43MSwtMTkuOTkgMCwtMTEuNDMgNy45MSwtMjAuMDQgMTguNDEsLTIwLjA0IDEwLjc2LDAgMTYuOTMsNy4wMSAxNi45MywxOS4yMiB2IDEuNTYgeiIKICAgICAgLz4KICAgICAgPHBhdGgKICAgICAgICBkPSJtIDU4Ni4xNiwyNzEuNzggYyAtNi4zLDAuNDQgLTkuNTMsNi4xNSAtOS41MywxNC43NiB2IDE3LjY5IGggLTcuMiB2IC0yOS41MSBjIDAsLTMuNzkgLTAuMzMsLTcuMDEgLTMuOTgsLTguMjYgdiAtMC4yOSBoIDEwLjg3IGMgMC4wMSwwLjg0IDAuMDgsOC42NCAwLjA4LDguNjQgMi42NSwtNi45MyA3LjY2LC05LjUxIDExLjU2LC05LjUxIDIuMDcsMCA0LjMzLDAuMjUgNi41MSwyLjE5IC0wLjE3LDAuNTQgLTEuNTksNS4xMiAtMS45MSw2LjE0IC0xLjYsLTEuMjEgLTQuMDIsLTIuMDIgLTYuNCwtMS44NSIKICAgICAgLz4KICAgICAgPHBhdGggCiAgICAgICAgZD0ibSA2MjEuNTksMjkzLjYxIGMgMCw5LjA5IC04Ljg3LDExLjYxIC0xMy43NSwxMS42MSAtNC40OCwwIC04LjQ3LC0wLjk2IC0xMS40OCwtMi44MyB2IC02LjcxIGMgMy4yNywyLjU4IDcuMyw0LjA1IDExLjU0LDQuMDUgNC43NCwwIDYuNjcsLTIuNjUgNi43OCwtNS4xNCAwLjEyLC0yLjYxIC0xLjU5LC00LjUgLTQuNTMsLTUuOTQgLTIuNTUsLTEuMjUgLTUuMTMsLTIuNTEgLTYuNDYsLTMuMiAtMy4zMywtMS43NSAtNy4wOSwtNC4zMyAtNy4wOSwtOS42MiAwLC03Ljg3IDcuMzYsLTEwLjU2IDEyLjkzLC0xMC41NiA0LjI3LDAgNy43NCwwLjggMTAuMzEsMi40MiB2IDYuMjQgYyAtMy4wMSwtMi4xMSAtNS45OSwtMy4xNiAtOS44NiwtMy4xNiAtMy45LDAgLTYuMjYsMS41MiAtNi4zNSw0LjA0IC0wLjA4LDIuNDkgMS42NCwzLjYxIDMuNjIsNC43MiAxLjg4LDEuMDYgNC4yMiwyLjA5IDcuMTksMy42NiAzLjUxLDEuODQgNy4xNSw0LjM3IDcuMTUsMTAuNDIiCiAgICAgIC8+CiAgICAgIDxwYXRoCiAgICAgICAgZD0ibSA3MTAuNjgsMjY2LjE3IC0yNi4zLDU3LjA0IGggLTcuMTggbCAxMS44OCwtMjUuNzEgLTExLjQsLTIzLjI5IGMgLTEuNzIsLTMuNDQgLTMuMzYsLTYuODQgLTYuMzMsLTcuNzYgdiAtMC4yOSBoIDEwLjU0IGwgMTAuOTUsMjMuNDkgMTAuNzMsLTIzLjQ5IGggNy4xMSB6IgogICAgICAvPgogICAgICA8cGF0aAogICAgICAgIGQ9Im0gMjU3LjY3LDI5OS43MSBjIDMuMDEsMCA1LjQ1LC0wLjg4IDguMDMsLTIuMzYgdiA1LjQ5IGMgLTIuNjQsMS41MSAtNi4wMiwyLjM1IC04LjkyLDIuMzUgLTcuNTMsMCAtMTIuMTksLTQuMjcgLTEyLjE5LC0xMS43MSB2IC0yMS43NiBoIC02LjExIGwgMTMuMjMsLTE0LjgyIHYgOS4yNSBoIDEyLjAzIHYgNS41NyBIIDI1MS43IHYgMjEuMzUgYyAwLDQuOSAyLjk1LDYuNjQgNS45Nyw2LjY0IgogICAgICAvPgogICAgICA8cGF0aAogICAgICAgIGQ9Im0gMjc1LjEzLDI4NS4yMiBjIDAsOC4zNSA1LjQ3LDE0LjQgMTMuMDEsMTQuNCA3LjUzLDAgMTMsLTYuMDYgMTMsLTE0LjQgMCwtOC4zOCAtNS40NywtMTQuNDYgLTEzLC0xNC40NiAtNy41NCwwIC0xMy4wMSw2LjA4IC0xMy4wMSwxNC40NiBtIC03LjQ1LDAgYyAwLC0xMS40MiA4Ljc5LC0yMC4wNCAyMC40NSwtMjAuMDQgMTEuODUsMCAyMC40NSw4LjQzIDIwLjQ1LDIwLjA0IDAsOS45MiAtNy4wOCwxOS45OCAtMjAuNjIsMTkuOTggLTExLjU2LDAgLTIwLjI4LC04LjYgLTIwLjI4LC0xOS45OCIKICAgICAgLz4KICAgICAgPHBhdGgKICAgICAgICBkPSJtIDE2OS43OCwyODEuMzggOS41OCwtMjMuNzkgMTAuMDksMjMuNzkgeiBtIDI5LjM2LDIyLjgzIGggNy45NiBsIC0yNC4wMSwtNTYuMiBoIC0xMC45NCB2IDAuMzEgYyAzLjA3LDEuNDUgMi4zMyw1LjIgMC4yNywxMC4yOSBsIC0xOC44Myw0NS42IGggNi45NyBsIDYuOTYsLTE3LjI2IGggMjQuMjcgeiIKICAgICAgLz4KICAgICAgPHBhdGggCiAgICAgICAgZD0ibSAzMTYuOCwyNzQuNzIgYyAwLC0zLjc5IC0wLjMzLC03LjAyIC0zLjk5LC04LjI3IHYgLTAuMjkgaCAxMC42NCBsIDAuMiw1Ljk1IGMgMy43NCwtNS44NiA5LjExLC02LjkzIDEzLjAzLC02LjkzIDIuOTYsMCAxMi42LDEuMDQgMTIuNiwxNC40OCB2IDI0LjU1IGggLTcuMiB2IC0yNC42MiBjIDAsLTUuNTggLTIuOTksLTguOTEgLTguMDEsLTguOTEgLTMuOSwwIC03LjY0LDIuNDkgLTEwLjA1LDYuNzQgdiAyNi43OSBoIC03LjIxIGwgLTAuMDEsLTI5LjQ5IgogICAgICAvPgogICAgICA8cGF0aAogICAgICAgIGQ9Im0gMjM1LjU1LDI5My4yNyBjIDAuMTIsOS4wOCAtOC41MSwxMS45MSAtMTMuNDIsMTEuOTUgLTQuNjgsMC4wNCAtOC41NywtMC43NCAtMTEuNjIsLTIuNTMgViAyOTYgYyAzLjMzLDIuNDggNy4wNCwzLjc4IDExLjQ4LDMuNzMgNC42MiwtMC4wNiA2LjY0LC0yLjY4IDYuNjksLTUuMjkgMC4wNSwtMi42MiAtMS43MSwtNC40NiAtNC42OSwtNS44MiAtMi41OCwtMS4xOCAtNS4xOSwtMi4zOCAtNi41NCwtMy4wMyAtMy4zOCwtMS42NyAtNy4yMSwtNC4xNSAtNy4zNCwtOS40NCAtMC4yLC03Ljk2IDcuNDYsLTEwLjgyIDEyLjc5LC0xMC45IDQuMjcsLTAuMDYgNy43MSwwLjYgMTAuMzIsMi4xNSB2IDYuMjQgYyAtMy4wNywtMi4wMyAtNS44MiwtMi45NCAtOS43NywtMi45MSAtMy44NiwwLjA0IC02LjMyLDEuNjkgLTYuMzMsNC4yMSAtMC4wMiwyLjQ4IDEuNzMsMy41NiAzLjc0LDQuNjIgMS45LDEuMDEgNC4yNiwxLjk4IDcuMjgsMy40NyAzLjU1LDEuNzYgNy4zMyw0LjIyIDcuNDEsMTAuMjQiCiAgICAgIC8+CiAgICA8L2c+CiAgPC9nPgo8L3N2Zz4K" />
         <div class="header">
-            <h1 class="main-header">Measuring Symmetry Preference by Age</h1>
+            <h1 class="main-header">Completing Measuring Symmetry Preference by Age</h1>
         </div>
         <div class="error-form" style="display:none">
             <div class="description">
                 <span>Unfortunately we've encountered an issue, please contact the organisers for further details, quoting your Prolific ID.</span>
             </div>
         </div>
-            <div class="form">
-                <div class="description">
-                    <span>Welcome, this portal will allow you to consent to the Measuring Symmetry Preference by Age experiment and recieve the instructions to download the Virtual Reality Environment.</span>
-                    <br />
-                    <br />
-                    <span>Please begin by entering your Prolific ID below:</span>
-                </div>
-                <div class="participant-id">
-                    <div class="user-message">
-                        <span class="message">
-                        </span>
-                    </div>
-                    <input type="text" placeholder="Enter your participant ID..." class="input" />
-                </div>
-                <div class="headset-type">
-                    <div class="user-message">
-                        <span class="message">
-                        </span>
-                    </div>
-                    <span class="headset-type-label" for="ddlHeadset">Which headset will you be using?</span>
-                    <select id="ddlHeadset">
-                        <option value="" selected>Not selected</option>
-                        <option value="2">Quest</option>
-                        <option value="3">Quest 2</option>
-                        <option value="1">HTC Vive</option>
-                    </select>
-                </div>
-                <div class="complete-button">
-                    <h1 class="submit-button">Submit</h1>
-                </div>
+        <div class="form">
+            <div class="description">
+                <span>Welcome, this portal will allow you to consent to the Measuring Symmetry Preference by Age experiment and recieve the instructions to download the Virtual Reality Environment.</span>
+                <br />
+                <br />
+                <span>Please begin by entering your Prolific ID below:</span>
             </div>
-
-            <div class="consent-form" style="display:none">
-                <div class="description">
-                    <span>The consent form for the Measuring Symmetry Preference by Age experiment is shown below.</span>
-                    <br />
-                    <br />
-                    <span>Please confirm that you consent to each of these terms:</span>
+            <div class="participant-id">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
                 </div>
-                <input type="hidden" id="hdnParticipantId" />
-                <div class="clause" style="display:none">
-                    <div class="user-message">
-                        <span class="message">
-                        </span>
-                    </div>
-                    <label class="lblClauseText"></label>
-                    <input type="checkbox" class="chkAccept" />
-                </div>
-                <div class="complete-button">
-                    <h1 class="submit-consent-button">Submit</h1>
-                </div>
+                <input type="text" placeholder="Enter your participant ID..." class="input" />
             </div>
-            <div class="instructions" style="display:none">
-                <span>Thank you for consenting to the Measuring Symmetry Preference by Age experiment, in order to download the VR environment, please follow these instructions:</span><br /><br />
-                <span class="details"></span> <br /><br />
-                <span>Once you are happy with the instructions you can close this window.</span>
+            <div class="complete-button">
+                <h1 class="submit-button">Submit</h1>
             </div>
         </div>
+        <div class="instructions" style="display:none">
+            <span>Thank you for completing the Measuring Symmetry Preference by Age experiment, in order to mark your attempt as complete on Prolific and uninstall the VR environment, please follow these instructions:</span><br /><br />
+            <span class="details"></span> <br /><br />
+            <span>Once you are happy with the instructions you can close this window.</span>
+        </div>
+    </div>
 </body>
 </html>

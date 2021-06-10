@@ -46,7 +46,7 @@ namespace MainEnvironment.Web.Services
                     var participant = await this.ExperimentRepo.MarkConsentFormAsAccepted(consentForm.ParticipantId);
                     if (participant != null)
                     {
-                        instructions = await InstructionsRepo.GetInstructionsForParticipant(participant);
+                        instructions = await InstructionsRepo.GetInstallInstructionsForParticipant(participant);
                     }
                 }
             }

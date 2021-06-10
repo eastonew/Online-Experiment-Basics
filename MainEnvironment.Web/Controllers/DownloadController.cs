@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
@@ -23,9 +24,19 @@ namespace MainEnvironment.Web.Controllers
             this.ConsentService = consentService;
             this.DownloadService = appDownloadService;
         }
+
+        [HttpGet]
         public IActionResult Get()
         {
             var text = System.IO.File.ReadAllText("content/consent.html");
+            //this needs to return a form to allow the user to enter thewir participant Id
+            return Content(text, "text/html", Encoding.UTF8);
+        }
+
+        [HttpGet("Complete")]
+        public IActionResult GetCompletePage()
+        {
+            var text = System.IO.File.ReadAllText("content/complete.html");
             //this needs to return a form to allow the user to enter thewir participant Id
             return Content(text, "text/html", Encoding.UTF8);
         }
@@ -34,11 +45,22 @@ namespace MainEnvironment.Web.Controllers
         public async Task<IActionResult> GetConsentForm(ParticipantModel model)
         {
             ConsentFormModel consentDetails = null;
-            if(!String.IsNullOrEmpty(model.ParticipantId))
+            if (!String.IsNullOrEmpty(model.ParticipantId))
             {
                 consentDetails = await this.ConsentService.GetConsentFormModel(model);
             }
             return StatusCode((int)HttpStatusCode.OK, consentDetails);
+        }
+
+        [HttpPost("GetCompletionDetails")]
+        public async Task<IActionResult> GetCompletionDetails(ParticipantModel model)
+        {
+            DownloadInstructionsModel completionInstructions = null;
+            if (!String.IsNullOrEmpty(model.ParticipantId))
+            {
+                completionInstructions = await this.DownloadService.GetCompletionInstructions(model);
+            }
+            return StatusCode((int)HttpStatusCode.OK, completionInstructions);
         }
 
         [HttpPost("SubmitConsentForm")]

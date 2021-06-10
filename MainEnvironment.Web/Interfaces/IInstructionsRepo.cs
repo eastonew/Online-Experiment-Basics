@@ -9,6 +9,8 @@ namespace MainEnvironment.Web.Interfaces
 {
     public interface IInstructionsRepo
     {
-        Task<DownloadInstructionsModel> GetInstructionsForParticipant(ParticipantModel participant);
+        Task<DownloadInstructionsModel> GetInstallInstructionsForParticipant(ParticipantModel participant);
+
+        Task<DownloadInstructionsModel> GetUninstallInstructionsForParticipant(ParticipantModel participant);
     }
 }
