@@ -178,5 +178,59 @@ namespace MainEnvironment.Web.Services
             }
             return success;
         }
+
+        public async Task<ParticipantInformationModel> GetParticipantInformationSheet(string participantId)
+        {
+            ParticipantInformationModel details = null;
+            //if a participant has a key assigned they have tried the experiment before
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && !p.ConsentFormAccepted);
+            if (participant != null && participant.ExperimentId != null)
+            {
+                var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == participant.ExperimentId && e.IsLive);
+                if (experiment != null)
+                {
+                    details = new ParticipantInformationModel();
+                    details.ParticipantId = participantId;
+                    details.ParticipantInformationSheet = experiment.ParticipantInformationSheet;
+                }
+            }
+            return details;
+        }
+
+        public async Task<bool> CreateParticipant(string participantId, EquipmentTypeEnum equipment, Guid experimentId)
+        {
+            bool success = false;
+            try
+            {
+                //check for duplicates
+                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId);
+                if (participant == null)
+                {
+                    participant = new Participant();
+                    participant.Id = Guid.NewGuid();
+                    participant.ExternalParticipantId = participantId;
+                    participant.ExperimentId = experimentId;
+                    participant.Completed = false;
+                    participant.CompletedDate = null;
+                    participant.ApiKey = null;
+                    participant.KeyExpirationDate = null;
+                    participant.ConsentFormAccepted = false;
+                    participant.ConsentFormAcceptedDate = null;
+                    participant.DownloadToken = null;
+                    participant.DownloadedEnvironment = false;
+                    participant.EquipmentType = equipment;
+                    this.Context.Participants.Add(participant);
+                }
+                else
+                {
+                    participant.EquipmentType = equipment;
+                }
+
+                await this.Context.SaveChangesAsync();
+                success = true;
+            }
+            catch { }
+            return success;
+        }
     }
 }

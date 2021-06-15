@@ -10,5 +10,6 @@ namespace MainEnvironment.Web.Interfaces
     {
         Task<ConsentFormModel> GetConsentFormModel(ParticipantModel participantDetails);
         Task<DownloadInstructionsModel> SubmitConsentForm(ConsentFormModel consentForm);
+        Task<ParticipantInformationModel> GetParticipantInformation(ParticipantModel consentForm);
     }
 }

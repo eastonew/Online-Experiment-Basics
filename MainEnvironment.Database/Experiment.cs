@@ -12,6 +12,7 @@ namespace MainEnvironment.Database
         public DateTime EndDate { get; set; }
         public bool IsLive { get; set; }
         public string ExperimentDefinition { get; set; }
+        public string ParticipantInformationSheet { get; set; }
         public virtual ICollection<ConsentFormClause> ConsentFormClauses { get; set; }
     }
 }

@@ -4,6 +4,9 @@
     <meta charset="utf-8" />
     <title>Download Experiment Software</title>
     <style>
+        ul {
+            list-style-position: inside;
+        }
         .input {
             padding: 15px;
             width: 98%;
@@ -151,7 +154,7 @@
                 margin-right: auto;
             }
 
-        .submit-button, .submit-consent-button {
+        .submit-button, .submit-consent-button, .submit-information-button {
             width: 40vw;
             max-width: 700px;
             max-height: 50px;
@@ -205,7 +208,7 @@
             $(".submit-button").on("click", function () {
                 var id = $(".input").val();
                 var equipment = $("#ddlHeadset").val();
-                
+
                 if (!id || !equipment) {
                     if (!id) {
                         $(".input").addClass("error");
@@ -225,31 +228,22 @@
                     }
                 }
                 else {
-                    $(".input").removeClass("error");
-                    $("#ddlHeadset").removeClass("error");
                     $.ajax
                         ({
                             type: "POST",
-                            url: "/api/download/getconsentform",
+                            url: "/api/download/getparticipantinformation",
                             contentType: "application/json",
                             data: JSON.stringify({ participantId: id, equipmentType: equipment })
                         }).done(function (data) {
                             $(".form").hide();
-                            
-                            if (!data || !data.clauses || !data.clauses.length) {
+                            $("#hdnParticipantId").val(data.participantId);
+                            if (!data || !data.participantInformationSheet) {
                                 $(".error-form").show();
                             }
                             else {
-                                $(".consent-form").show();
-                                $("#hdnParticipantId").val(data.participantId);
-                                $(".main-header").text("Measuring Symmetry Preference by Age Consent");
-                                for (var i = 0; i < data.clauses.length; i++) {
-                                    var clause = data.clauses[i];
-                                    var $clause = $(".consent-form .clause").not(':visible').clone();
-                                    $clause.find(".chkAccept").val(clause.id);
-                                    $clause.find(".lblClauseText").text(clause.clause);
-                                    $clause.show().insertBefore($(".consent-form .complete-button"));
-                                }
+                                $(".information").show();
+                                $(".main-header").text("Measuring Symmetry Preference by Age Participant Information");
+                                $(".information .information-sheet").html(data.participantInformationSheet);
                             }
                         })
                         .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
@@ -306,6 +300,44 @@
                 }
 
             });
+
+            $(".submit-information-button").on("click", function () {
+                var id = $("#hdnParticipantId").val();
+
+                if (!id) {
+                    $(".information").hide();
+                    $(".error-form").show();
+                }
+                else {
+                    $.ajax
+                        ({
+                            type: "POST",
+                            url: "/api/download/getconsentform",
+                            contentType: "application/json",
+                            data: JSON.stringify({ participantId: id })
+                        }).done(function (data) {
+                            $(".information").hide();
+
+                            if (!data || !data.clauses || !data.clauses.length) {
+                                $(".error-form").show();
+                            }
+                            else {
+                                $(".consent-form").show();
+                                $(".main-header").text("Measuring Symmetry Preference by Age Consent");
+                                for (var i = 0; i < data.clauses.length; i++) {
+                                    var clause = data.clauses[i];
+                                    var $clause = $(".consent-form .clause").not(':visible').clone();
+                                    $clause.find(".chkAccept").val(clause.id);
+                                    $clause.find(".lblClauseText").text(clause.clause);
+                                    $clause.show().insertBefore($(".consent-form .complete-button"));
+                                }
+                            }
+                        })
+                        .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
+                }
+
+            });
+
         });
     </script>
 </head>
@@ -320,63 +352,69 @@
                 <span>Unfortunately we've encountered an issue, please contact the organisers for further details, quoting your Prolific ID.</span>
             </div>
         </div>
-            <div class="form">
-                <div class="description">
-                    <span>Welcome, this portal will allow you to consent to the Measuring Symmetry Preference by Age experiment and recieve the instructions to download the Virtual Reality Environment.</span>
-                    <br />
-                    <br />
-                    <span>Please begin by entering your Prolific ID below:</span>
-                </div>
-                <div class="participant-id">
-                    <div class="user-message">
-                        <span class="message">
-                        </span>
-                    </div>
-                    <input type="text" placeholder="Enter your participant ID..." class="input" />
-                </div>
-                <div class="headset-type">
-                    <div class="user-message">
-                        <span class="message">
-                        </span>
-                    </div>
-                    <span class="headset-type-label" for="ddlHeadset">Which headset will you be using?</span>
-                    <select id="ddlHeadset">
-                        <option value="" selected>Not selected</option>
-                        <option value="2">Quest</option>
-                        <option value="3">Quest 2</option>
-                        <option value="1">HTC Vive</option>
-                    </select>
-                </div>
-                <div class="complete-button">
-                    <h1 class="submit-button">Submit</h1>
-                </div>
+        <div class="form">
+            <div class="description">
+                <span>Welcome, this portal will allow you to consent to the Measuring Symmetry Preference by Age experiment and recieve the instructions to download the Virtual Reality Environment.</span>
+                <br />
+                <br />
+                <span>Please begin by entering your Prolific ID below:</span>
             </div>
-
-            <div class="consent-form" style="display:none">
-                <div class="description">
-                    <span>The consent form for the Measuring Symmetry Preference by Age experiment is shown below.</span>
-                    <br />
-                    <br />
-                    <span>Please confirm that you consent to each of these terms:</span>
+            <div class="participant-id">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
                 </div>
-                <input type="hidden" id="hdnParticipantId" />
-                <div class="clause" style="display:none">
-                    <div class="user-message">
-                        <span class="message">
-                        </span>
-                    </div>
-                    <label class="lblClauseText"></label>
-                    <input type="checkbox" class="chkAccept" />
-                </div>
-                <div class="complete-button">
-                    <h1 class="submit-consent-button">Submit</h1>
-                </div>
+                <input type="text" placeholder="Enter your participant ID..." class="input" />
             </div>
-            <div class="instructions" style="display:none">
-                <span>Thank you for consenting to the Measuring Symmetry Preference by Age experiment, in order to download the VR environment, please follow these instructions:</span><br /><br />
-                <span class="details"></span> <br /><br />
-                <span>Once you are happy with the instructions you can close this window.</span>
+            <div class="headset-type">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
+                </div>
+                <span class="headset-type-label" for="ddlHeadset">Which headset will you be using?</span>
+                <select id="ddlHeadset">
+                    <option value="" selected>Not selected</option>
+                    <option value="2">Quest</option>
+                    <option value="3">Quest 2</option>
+                    <option value="1">HTC Vive</option>
+                </select>
+            </div>
+            <div class="complete-button">
+                <h1 class="submit-button">Submit</h1>
             </div>
         </div>
+        <div class="information" style="display:none">
+            <span>Thank you for expressing an interest in the Measuring Symmetry Preference by Age experiment, in order to proceed please read the following information:</span><br /><br />
+            <span class="information-sheet"></span> <br /><br />
+            <div class="complete-button">
+                <h1 class="submit-information-button">Continue</h1>
+            </div>
+        </div>
+        <div class="consent-form" style="display:none">
+            <div class="description">
+                <span>The consent form for the Measuring Symmetry Preference by Age experiment is shown below.</span>
+                <br />
+                <br />
+                <span>Please confirm that you consent to each of these terms, if you do not agree to these terms please return your submission on Prolific by selecting the 'Stop without completing' button.</span>
+            </div>
+            <input type="hidden" id="hdnParticipantId" />
+            <div class="clause" style="display:none">
+                <div class="user-message">
+                    <span class="message">
+                    </span>
+                </div>
+                <label class="lblClauseText"></label>
+                <input type="checkbox" class="chkAccept" />
+            </div>
+            <div class="complete-button">
+                <h1 class="submit-consent-button">Submit</h1>
+            </div>
+        </div>
+        <div class="instructions" style="display:none">
+            <span>Thank you for consenting to the Measuring Symmetry Preference by Age experiment, in order to download the VR environment, please follow these instructions:</span><br /><br />
+            <span class="details"></span> <br /><br />
+            <span>Once you are happy with the instructions you can close this window.</span>
+        </div>
+    </div>
 </body>
 </html>

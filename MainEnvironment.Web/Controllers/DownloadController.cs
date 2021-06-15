@@ -52,6 +52,17 @@ namespace MainEnvironment.Web.Controllers
             return StatusCode((int)HttpStatusCode.OK, consentDetails);
         }
 
+        [HttpPost("GetParticipantInformation")]
+        public async Task<IActionResult> GetParticipantInformation(ParticipantModel model)
+        {
+            ParticipantInformationModel informationDetails = null;
+            if (!String.IsNullOrEmpty(model.ParticipantId))
+            {
+                informationDetails = await this.ConsentService.GetParticipantInformation(model);
+            }
+            return StatusCode((int)HttpStatusCode.OK, informationDetails);
+        }
+
         [HttpPost("GetCompletionDetails")]
         public async Task<IActionResult> GetCompletionDetails(ParticipantModel model)
         {

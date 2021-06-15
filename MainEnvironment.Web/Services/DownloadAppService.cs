@@ -25,7 +25,7 @@ namespace MainEnvironment.Web.Services
             var participant = await this.ExperimentRepo.GetParticipantDetails(participantId);
             if (participant != null && participant.ExperimentId != null && participant.ExperimentId.Equals(experimentId))
             {
-                if(participant.EquipmentType == Core.Enums.EquipmentTypeEnum.Vive && participant.ConsentFormAccepted && !participant.Completed && !participant.DownloadedEnvironment)
+                if(participant.EquipmentType == Core.Enums.EquipmentTypeEnum.Vive && participant.ConsentFormAccepted && !participant.Completed)
                 {
                     if (participant.DownloadToken != null && participant.DownloadToken.Equals(downloadToken))
                     {

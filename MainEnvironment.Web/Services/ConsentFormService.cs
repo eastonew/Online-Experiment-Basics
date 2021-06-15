@@ -20,9 +20,17 @@ namespace MainEnvironment.Web.Services
 
         public async Task<ConsentFormModel> GetConsentFormModel(ParticipantModel participantDetails)
         {
-            //ideally this is handled elsewhere but is fine here for the moment
-           bool success = await this.ExperimentRepo.UpdateParticipantEquipment(participantDetails.ParticipantId, participantDetails.EquipmentType);
             return await this.ExperimentRepo.GetConsentForm(participantDetails.ParticipantId);
+        }
+
+        public async Task<ParticipantInformationModel> GetParticipantInformation(ParticipantModel participantDetails)
+        {
+            //ideally this is handled elsewhere but is fine here for the moment
+            //Unfortunately Prolific doesn't seem to like manual work, so I think we need to create a participant at this step, then cross check the final submissions with the people available on Prolific
+            //nothing seems to stop someone from just adding themselves and completing the process 
+            bool participantCreated = await this.ExperimentRepo.CreateParticipant(participantDetails.ParticipantId, participantDetails.EquipmentType, Guid.Parse("483DD908-A5BE-4DD4-A7F7-9BF042907156"));
+            //bool success = await this.ExperimentRepo.UpdateParticipantEquipment(participantDetails.ParticipantId, participantDetails.EquipmentType);
+            return await this.ExperimentRepo.GetParticipantInformationSheet(participantDetails.ParticipantId);
         }
 
         public async Task<DownloadInstructionsModel> SubmitConsentForm(ConsentFormModel consentForm)
