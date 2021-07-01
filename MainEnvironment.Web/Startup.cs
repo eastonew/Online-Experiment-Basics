@@ -43,6 +43,7 @@ namespace MainEnvironment.Web
             services.AddTransient<ILeanLogService, LeanLogService>();
             services.AddTransient<IDownloadAppService, DownloadAppService>();
             services.AddTransient<IDataAnalysisLogService, DataAnalysisLogService>();
+            services.AddTransient<ISecureTokenService, SecureTokenService>();
 
             services.AddDbContext<EnvironmentContext>(s => s.UseSqlServer(Configuration.GetConnectionString("ConnectionString"), options =>
             {

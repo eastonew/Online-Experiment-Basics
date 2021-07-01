@@ -22,6 +22,12 @@ namespace MainEnvironment.Web.Controllers
             this.ExperimentRepo = experimentRepo;
         }
 
+        [HttpGet("version")]
+        public ObjectResult GetVersion()
+        {
+            return StatusCode(200, "1.4");
+        }
+
         [HttpGet]
         public async Task<ActionResult> Get(string participantId)
         {

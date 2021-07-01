@@ -23,7 +23,7 @@ namespace MainEnvironment.Web.Services
             bool success = false;
             try
             {
-                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == log.ParticipantId && p.ApiKey == log.ApiKey && p.KeyExpirationDate > DateTime.UtcNow);
+                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => (p.ExternalParticipantId == log.ParticipantId || p.UniqueCode.ToLower() == log.ParticipantId.ToLower()) && p.ApiKey == log.ApiKey && p.KeyExpirationDate > DateTime.UtcNow);
                 if (participant != null)
                 {
                     if (!String.IsNullOrEmpty(log.Message) && log.LogDate != null && log.LogDate > DateTime.MinValue)

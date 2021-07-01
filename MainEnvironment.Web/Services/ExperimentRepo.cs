@@ -16,16 +16,20 @@ namespace MainEnvironment.Web.Services
     public class ExperimentRepo : IExperimentRepo
     {
         private readonly EnvironmentContext Context;
-        public ExperimentRepo(EnvironmentContext context)
+        private readonly ISecureTokenService SecureTokenService;
+        private readonly IInstructionsRepo instructionsRepo;
+        public ExperimentRepo(EnvironmentContext context, ISecureTokenService secureTokenService, IInstructionsRepo instructionsRepo)
         {
             this.Context = context;
+            this.SecureTokenService = secureTokenService;
+            this.instructionsRepo = instructionsRepo;
         }
         public async Task<SceneModel> GetExperimentDetails(string participantId)
         {
             SceneModel details = new SceneModel();
             //if a participant has a key assigned they have tried the experiment before
             //They can attempt the experiment as many times as they like until they complete it, but only have a specified time limit to do so, otherwise they need to restart
-            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId);
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId || p.UniqueCode.ToLower() == participantId.ToLower());
             if(participant != null && participant.ExperimentId != null)
             {
                 if (!participant.Completed && participant.ConsentFormAccepted)
@@ -147,7 +151,7 @@ namespace MainEnvironment.Web.Services
             bool success = true;
             try
             {
-                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && p.ApiKey == key);
+                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => (p.ExternalParticipantId == participantId || p.UniqueCode.ToLower() == participantId.ToLower()) && !p.Completed && p.ApiKey == key);
                 if (participant != null && participant.ExperimentId != null)
                 {
                     participant.Completed = true;
@@ -181,17 +185,31 @@ namespace MainEnvironment.Web.Services
 
         public async Task<ParticipantInformationModel> GetParticipantInformationSheet(string participantId)
         {
-            ParticipantInformationModel details = null;
+            ParticipantInformationModel details = new ParticipantInformationModel();
             //if a participant has a key assigned they have tried the experiment before
-            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && !p.Completed && !p.ConsentFormAccepted);
+            var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId);
             if (participant != null && participant.ExperimentId != null)
             {
-                var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == participant.ExperimentId && e.IsLive);
-                if (experiment != null)
+                if (participant.Completed)
                 {
-                    details = new ParticipantInformationModel();
-                    details.ParticipantId = participantId;
-                    details.ParticipantInformationSheet = experiment.ParticipantInformationSheet;
+                    details.ParticipantState = "Completed";
+                }
+                else if (participant.ConsentFormAccepted)
+                {
+                    details.ParticipantState = "Download";
+                    var instructions = await this.instructionsRepo.GetInstallInstructionsForParticipant(new ParticipantModel() { ParticipantId = participantId });
+                    details.Instructions = instructions.Instructions;
+                }
+                else
+                {
+                    details.ParticipantState = "Consent";
+                    var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == participant.ExperimentId && e.IsLive);
+                    if (experiment != null)
+                    {
+                        
+                        details.ParticipantId = participantId;
+                        details.ParticipantInformationSheet = experiment.ParticipantInformationSheet;
+                    }
                 }
             }
             return details;
@@ -202,8 +220,10 @@ namespace MainEnvironment.Web.Services
             bool success = false;
             try
             {
+                string uniqueCode = this.SecureTokenService.GenerateSecureToken(5);
                 //check for duplicates
-                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId);
+                //add check to ensure that we aren't getting confused with the same participant on another experiment - no need to check for null as if a participant's experiment is null, this needs to completely fail
+                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && p.ExperimentId.Equals(experimentId));
                 if (participant == null)
                 {
                     participant = new Participant();
@@ -219,10 +239,12 @@ namespace MainEnvironment.Web.Services
                     participant.DownloadToken = null;
                     participant.DownloadedEnvironment = false;
                     participant.EquipmentType = equipment;
+                    participant.UniqueCode = uniqueCode;
                     this.Context.Participants.Add(participant);
                 }
                 else
                 {
+                    participant.UniqueCode = uniqueCode;
                     participant.EquipmentType = equipment;
                 }
 

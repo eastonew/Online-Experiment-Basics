@@ -37,6 +37,7 @@ namespace MainEnvironment.Web.Services
                         //download token is just a guid -- ideally it would be a crypto secure string
                         participantDetails.DownloadToken = Guid.NewGuid();
                         await this.Context.SaveChangesAsync();
+                    
 
                         StringBuilder sb = new StringBuilder();
                         sb.Append("https://experimentapi.azurewebsites.net/api/download/vive/");
@@ -46,6 +47,11 @@ namespace MainEnvironment.Web.Services
                         sb.Append("/");
                         sb.Append(participantDetails.DownloadToken);
                         model.Instructions = model.Instructions.Replace("{{DownloadLink}}", sb.ToString());
+                    }
+
+                    if(model.Instructions.Contains("{{UniqueCode}}"))
+                    {
+                        model.Instructions = model.Instructions.Replace("{{UniqueCode}}", participantDetails.UniqueCode);
                     }
 
                 }

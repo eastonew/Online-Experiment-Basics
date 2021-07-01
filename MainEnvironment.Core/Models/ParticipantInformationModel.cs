@@ -8,5 +8,7 @@ namespace MainEnvironment.Core.Models
     {
         public string ParticipantId { get; set; }
         public string ParticipantInformationSheet { get; set; }
+        public string ParticipantState { get; set; }
+        public string Instructions { get; set; }
     }
 }

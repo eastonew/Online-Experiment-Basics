@@ -199,6 +199,25 @@
             display: block;
             margin-top:-10px;
         }
+        .unique-code {
+            border: 1px solid black;
+            padding:10px;
+            width:10vw;
+            margin-left:auto;
+            margin-right:auto;
+            margin-bottom:2vh;
+        }
+            .unique-code h4{
+            margin:0;
+            margin-bottom: 2vh
+        }
+            .unique-code .unique
+            {
+                font-weight: 600;
+                font-size: xx-large;
+                text-align: center;
+                display: block;
+            }
 
     </style>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -236,14 +255,24 @@
                             data: JSON.stringify({ participantId: id, equipmentType: equipment })
                         }).done(function (data) {
                             $(".form").hide();
-                            $("#hdnParticipantId").val(data.participantId);
-                            if (!data || !data.participantInformationSheet) {
+                            if (!data) {
                                 $(".error-form").show();
                             }
                             else {
-                                $(".information").show();
-                                $(".main-header").text("Measuring Symmetry Preference by Age Participant Information");
-                                $(".information .information-sheet").html(data.participantInformationSheet);
+                                if (data.participantState == "Consent" && data.participantInformationSheet) {
+                                    $("#hdnParticipantId").val(data.participantId);
+                                    $(".information").show();
+                                    $(".main-header").text("Measuring Symmetry Preference by Age Participant Information");
+                                    $(".information .information-sheet").html(data.participantInformationSheet);
+                                }
+                                else if (data.participantState == "Download") {
+                                    $(".instructions").show();
+                                    $(".instructions .details").html(data.instructions);
+                                    $(".main-header").text("Measuring Symmetry Preference by Age Download");
+                                }
+                                else if (data.participantState == "Completed") {
+                                    $(".completed-instructions").show();
+                                }
                             }
                         })
                         .fail(function (data) { console.log("Failed: " + JSON.stringify(data)) });
@@ -414,6 +443,10 @@
             <span>Thank you for consenting to the Measuring Symmetry Preference by Age experiment, in order to download the VR environment, please follow these instructions:</span><br /><br />
             <span class="details"></span> <br /><br />
             <span>Once you are happy with the instructions you can close this window.</span>
+        </div>
+        <div class="completed-instructions" style="display:none">
+            <span>Thank you, our records show you have completed this experiment</span><br /><br />
+            <span>Please navigate to <a href="https://experimentapi.azurewebsites.net/api/download/complete">https://experimentapi.azurewebsites.net/api/download/complete</a> to obtain the completion code and uninstall instructions</span><br /><br />
         </div>
     </div>
 </body>
