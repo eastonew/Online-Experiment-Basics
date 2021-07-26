@@ -223,12 +223,12 @@ namespace MainEnvironment.Web.Services
                 string uniqueCode = this.SecureTokenService.GenerateSecureToken(5);
                 //check for duplicates
                 //add check to ensure that we aren't getting confused with the same participant on another experiment - no need to check for null as if a participant's experiment is null, this needs to completely fail
-                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId && p.ExperimentId.Equals(experimentId));
+                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId.Trim() && p.ExperimentId.Equals(experimentId));
                 if (participant == null)
                 {
                     participant = new Participant();
                     participant.Id = Guid.NewGuid();
-                    participant.ExternalParticipantId = participantId;
+                    participant.ExternalParticipantId = participantId.Trim();
                     participant.ExperimentId = experimentId;
                     participant.Completed = false;
                     participant.CompletedDate = null;
