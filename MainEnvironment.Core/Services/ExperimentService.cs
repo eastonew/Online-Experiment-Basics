@@ -103,5 +103,27 @@ namespace MainEnvironment.Core.Services
             }
             return model;
         }
+
+        public async Task<string> GetExperimentVersion()
+        {
+            string version = null;
+            try
+            {
+                using (HttpClient client = new HttpClient())
+                {
+                    string url = $"{ApiHost}/api/experiment/version";
+                    var response = await client.GetAsync(url);
+                    if (response.StatusCode == HttpStatusCode.OK)
+                    {
+                        string result = await response.Content.ReadAsStringAsync();
+                        version = result;
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            return version;
+        }
     }
 }

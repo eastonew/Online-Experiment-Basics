@@ -82,17 +82,8 @@ namespace MainEnvironment.Core.Services
                             count--;
                         }
                     }
-                    //send the logs to the correct place
-                    if ((CurrentLogMode & LogMode.External) == LogMode.External)
-                    {
-                        await SaveLogs(logs);
-                    }
-
-                    if ((CurrentLogMode & LogMode.Local) == LogMode.Local)
-                    {
-                        PrintLogs(logs);
-                    }
-                    Thread.Sleep(10000);
+                    await this.SendLogsToCorrectDestination(logs);
+                    Thread.Sleep(2000);
                 }
                 OnDisposeCompleted?.Invoke();
             });
@@ -111,14 +102,45 @@ namespace MainEnvironment.Core.Services
 
         public void AddLog(ILogModel log)
         {
-            lock (_queueLock)
+            if (!Dispose)
             {
-                _logQueue.Enqueue(log);
+                lock (_queueLock)
+                {
+                    _logQueue.Enqueue(log);
+                }
             }
         }
-        public void TerminateLogger()
+        public async Task TerminateLogger()
         {
             this.Dispose = true;
+            List<ILogModel> logs = new List<ILogModel>();
+            lock (_queueLock)
+            {
+                if (_logQueue.Count > 0)
+                {
+                    int count = _logQueue.Count;
+                    while (count > 0)
+                    {
+                        logs.Add(_logQueue.Dequeue());
+                        count--;
+                    }
+                }
+            }
+            await this.SendLogsToCorrectDestination(logs);
+        }
+
+        private async Task SendLogsToCorrectDestination(List<ILogModel> logs)
+        {
+            //send the logs to the correct place
+            if ((CurrentLogMode & LogMode.External) == LogMode.External)
+            {
+                await SaveLogs(logs);
+            }
+
+            if ((CurrentLogMode & LogMode.Local) == LogMode.Local)
+            {
+                PrintLogs(logs);
+            }
         }
 
         private async Task SaveLogs(List<ILogModel> logsToSave)
