@@ -32,57 +32,36 @@ namespace MainEnvironment.ConsoleTest
                     new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 9" },
                     new TagModel(){ Id = Guid.NewGuid(), Name = "Test Tag 10" },
                 },
-                //Questionnaire = new QuestionnaireModel()
-                //{
-                //    Questions = new QuestionModel[]
-                //    {
-                //        new QuestionModel()
-                //        {
-                //            QuestionType = QuestionModel.QuestionTypeEnum.TrueFalse,
-                //            FalseAnswerText = "No",
-                //            TrueAnswerText = "Yes",
-                //            Prefix = "Can you see this question?",
-                //        }
-                //    }
-                //},
-                Rooms = new RoomModel[1]
-                {
-                    new RoomModel()
-                    {
-                         Order = 0,
-                         ShowDoorCaps = true,
-                         Depth = 50,
-                         Height = 5,
-                         Width = 50,
-                         Pedestals = new PedestalModel[150]
-                    }
-                }
+                Regions = null,
             };
 
-            Random rand = new Random();
-            for (int i = 0; i < 5; i++)
-            {
+            //TODO - need to implement a Mongo DB repo
+            
+
+            //Random rand = new Random();
+            //for (int i = 0; i < 5; i++)
+            //{
                 
-                var sculptureJson = File.ReadAllText($@"H:\Sculpturs\MainExperimentTest\SmallItems\Item{i}.json");
-                var sculpture = JsonConvert.DeserializeObject<SculptureExport>(sculptureJson);
-                model.Rooms[0].Pedestals[i] = new PedestalModel()
-                {
-                    Position = new Vector3(rand.Next(0,50)-25, 0, rand.Next(0,50)-25),
-                    Scale = new Vector3(3, 0.5f, 3),
-                    Sculpture = new SculptureModel()
-                    {
-                        Shapes = sculpture.CalculatedPoints.Select(p => new ComponentModel()
-                        {
-                             Position = p,
-                              Shape = new ShapeModel()
-                              {
-                                  BaseShape = ShapeModel.ShapeModelBaseEnum.Sphere,
-                                  Scale = new Vector3(0.05f, 0.05f, 0.05f)
-                              }
-                        }).ToList()
-                    }
-                };
-            }
+            //    var sculptureJson = File.ReadAllText($@"H:\Sculpturs\MainExperimentTest\SmallItems\Item{i}.json");
+            //    var sculpture = JsonConvert.DeserializeObject<SculptureExport>(sculptureJson);
+            //    model.Rooms[0].Pedestals[i] = new PedestalModel()
+            //    {
+            //        Position = new Vector3(rand.Next(0,50)-25, 0, rand.Next(0,50)-25),
+            //        Scale = new Vector3(3, 0.5f, 3),
+            //        Sculpture = new SculptureModel()
+            //        {
+            //            Shapes = sculpture.CalculatedPoints.Select(p => new ComponentModel()
+            //            {
+            //                 Position = p,
+            //                  Shape = new ShapeModel()
+            //                  {
+            //                      BaseShape = ShapeModel.ShapeModelBaseEnum.Sphere,
+            //                      Scale = new Vector3(0.05f, 0.05f, 0.05f)
+            //                  }
+            //            }).ToList()
+            //        }
+            //    };
+            //}
             
 
             //for(int i = 0; i < 100; i++)
