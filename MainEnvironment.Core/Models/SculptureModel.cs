@@ -7,6 +7,7 @@ namespace MainEnvironment.Core
 {
     public class SculptureModel
     {
-        public List<ComponentModel> Shapes { get; set; }
+        public Guid SculptureId { get; set; }
+        public Guid GroupId { get; set; }
     }
 }
