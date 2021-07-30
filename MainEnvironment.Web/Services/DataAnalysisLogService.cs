@@ -6,6 +6,7 @@ using MainEnvironment.Web.Interfaces;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.Linq;
 using System.Threading.Tasks;
 
@@ -108,9 +109,22 @@ namespace MainEnvironment.Web.Services
                     var rightSculptureIndex = int.Parse(sculptureInfo.model.AdditionalValues.First(l => l.Key == "RightSculptureId").Value);
                     var leftSculptureIndex = int.Parse(sculptureInfo.model.AdditionalValues.First(l => l.Key == "LeftSculptureId").Value);
 
-                    var rightSculptureSymLevel = float.Parse(sculptureInfo.model.AdditionalValues.First(l => l.Key == "RightSculptureValue").Value);
-                    var leftSculptureSymLevel = float.Parse(sculptureInfo.model.AdditionalValues.First(l => l.Key == "LeftSculptureValue").Value);
-
+                    float rightSculptureSymLevel = 0;
+                    float leftSculptureSymLevel = 0;
+                    //hack to prevent comma formatted results causing problems
+                    string rightSymLevel = sculptureInfo.model.AdditionalValues.First(l => l.Key == "RightSculptureValue").Value;
+                    string leftSymLevel = sculptureInfo.model.AdditionalValues.First(l => l.Key == "LeftSculptureValue").Value;
+                    if (rightSymLevel.Contains(",") || leftSymLevel.Contains(","))
+                    {
+                        var culture = CultureInfo.CreateSpecificCulture("fr-FR");
+                        rightSculptureSymLevel = float.Parse(rightSymLevel, culture);
+                        leftSculptureSymLevel = float.Parse(leftSymLevel, culture);
+                    }
+                    else
+                    {
+                        rightSculptureSymLevel = float.Parse(rightSymLevel);
+                        leftSculptureSymLevel = float.Parse(leftSymLevel);
+                    }
                     var chosenItem = (SculptureAnalysisLogData.LeanDirection)Enum.Parse(typeof(SculptureAnalysisLogData.LeanDirection), sculptureChoice.model.AdditionalValues.First(l => l.Key == "LeanDirection").Value);
 
                     SculptureAnalysisLogData sculptureChoiceLog = new SculptureAnalysisLogData()
