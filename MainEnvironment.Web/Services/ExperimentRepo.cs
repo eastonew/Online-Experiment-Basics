@@ -18,11 +18,13 @@ namespace MainEnvironment.Web.Services
         private readonly EnvironmentContext Context;
         private readonly ISecureTokenService SecureTokenService;
         private readonly IInstructionsRepo instructionsRepo;
-        public ExperimentRepo(EnvironmentContext context, ISecureTokenService secureTokenService, IInstructionsRepo instructionsRepo)
+        private readonly IParticipantGroupService ParticipantGroupService;
+        public ExperimentRepo(EnvironmentContext context, ISecureTokenService secureTokenService, IInstructionsRepo instructionsRepo, IParticipantGroupService participantGroupService)
         {
             this.Context = context;
             this.SecureTokenService = secureTokenService;
             this.instructionsRepo = instructionsRepo;
+            this.ParticipantGroupService = participantGroupService;
         }
         public async Task<SceneModel> GetExperimentDetails(string participantId)
         {
@@ -54,10 +56,14 @@ namespace MainEnvironment.Web.Services
                             details = new SceneModel();
                         }
 
+                        int groupId = this.ParticipantGroupService.AssignGroupToParticipant(experiment.TotalGroups);
+                        details.GroupId = groupId;
+
                         //ideally this will be a cryptographically secure key but for now just send a unique Guid
                         Guid key = Guid.NewGuid();
                         details.ApiKey = key.ToString();
                         participant.ApiKey = details.ApiKey;
+                        participant.GroupId = groupId;
                         participant.KeyExpirationDate = DateTime.UtcNow.AddDays(5); // DateTime.UtcNow.AddMinutes(40); //as part of the rules once they have started they will need to 
                         Context.Update(participant);
                         await this.Context.SaveChangesAsync();
@@ -85,6 +91,18 @@ namespace MainEnvironment.Web.Services
                 details.ErrorMessage = "CannotFind";
             }
             return details;
+        }
+
+        public async Task<string> GetExperimentVersion()
+        {
+            string version = "";
+            //GEt the first live experiment - not perfect but should be ok as only one experiment should be live at any time
+            var experiment = await this.Context.Experiments.FirstOrDefaultAsync(e => e.IsLive);
+            if (experiment != null)
+            {
+                version = experiment.RequiredAppVersion;
+            }
+            return version;
         }
 
         public async Task<bool> UpdateParticipantEquipment(string participantId, EquipmentTypeEnum equipment)

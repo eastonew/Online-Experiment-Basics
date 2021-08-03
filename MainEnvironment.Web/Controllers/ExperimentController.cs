@@ -23,9 +23,10 @@ namespace MainEnvironment.Web.Controllers
         }
 
         [HttpGet("version")]
-        public ObjectResult GetVersion()
+        public async Task<ObjectResult> GetVersion()
         {
-            return StatusCode(200, "1.4");
+            string version = await this.ExperimentRepo.GetExperimentVersion();
+            return StatusCode(200, version);
         }
 
         [HttpGet]

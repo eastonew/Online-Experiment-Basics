@@ -21,5 +21,6 @@ namespace MainEnvironment.Database
         public bool DownloadedEnvironment { get; set; }
         public Guid? DownloadToken { get; set; }
         public string UniqueCode { get; set; }
+        public int GroupId { get; set; }
     }
 }

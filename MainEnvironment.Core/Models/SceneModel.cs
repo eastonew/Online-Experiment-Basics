@@ -20,5 +20,6 @@ namespace MainEnvironment.Core
         public ActionEnum AvailableActions { get; set; }
         public TagModel[] AllTags { get; set; }
         public string ErrorMessage { get; set; }
+        public int GroupId { get; set; }
     }
 }

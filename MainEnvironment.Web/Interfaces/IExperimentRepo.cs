@@ -18,5 +18,6 @@ namespace MainEnvironment.Web.Interfaces
         Task<ParticipantInformationModel> GetParticipantInformationSheet(string participantId);
         Task<Participant> GetParticipantDetails(Guid participantId);
         Task<bool> MarkAsDownloaded(Guid participantId);
+        Task<string> GetExperimentVersion();
     }
 }

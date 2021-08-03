@@ -44,6 +44,7 @@ namespace MainEnvironment.Web
             services.AddTransient<IDownloadAppService, DownloadAppService>();
             services.AddTransient<IDataAnalysisLogService, DataAnalysisLogService>();
             services.AddTransient<ISecureTokenService, SecureTokenService>();
+            services.AddTransient<IParticipantGroupService, RandomParticipantGroupService>();
 
             services.AddDbContext<EnvironmentContext>(s => s.UseSqlServer(Configuration.GetConnectionString("ConnectionString"), options =>
             {
