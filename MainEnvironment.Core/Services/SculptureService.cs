@@ -20,21 +20,15 @@ namespace MainEnvironment.Core.Services
         {
             //TODO - Maybe allow bulk download but leave as this for now
             ExportDefinition sculpture = null;
-            try
+
+            using (HttpClient client = new HttpClient())
             {
-                using (HttpClient client = new HttpClient())
+                string url = $"{ApiHost}/ThreeDee/{sculptureId}";
+                var response = await client.GetAsync(url);
+                if (response.StatusCode == HttpStatusCode.OK)
                 {
-                    string url = $"{ApiHost}/ThreeDee/{sculptureId}";
-                    var response = await client.GetAsync(url);
-                    if (response.StatusCode == HttpStatusCode.OK)
-                    {
-                        sculpture = JsonConvert.DeserializeObject<ExportDefinition>(await response.Content.ReadAsStringAsync());
-                    }
+                    sculpture = JsonConvert.DeserializeObject<ExportDefinition>(await response.Content.ReadAsStringAsync());
                 }
-            }
-            catch (Exception ex)
-            {
-                // _failures.Add(ex);
             }
             return sculpture;
         }

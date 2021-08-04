@@ -8,6 +8,6 @@ namespace MainEnvironment.Core
     public class SculptureModel
     {
         public Guid SculptureId { get; set; }
-        public Guid GroupId { get; set; }
+        public int GroupId { get; set; }
     }
 }
