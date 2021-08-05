@@ -56,14 +56,11 @@ namespace MainEnvironment.Web.Services
                             details = new SceneModel();
                         }
 
-                        int groupId = this.ParticipantGroupService.AssignGroupToParticipant(experiment.TotalGroups);
-                        details.GroupId = groupId;
-
                         //ideally this will be a cryptographically secure key but for now just send a unique Guid
                         Guid key = Guid.NewGuid();
                         details.ApiKey = key.ToString();
+                        details.GroupId = participant.GroupId;
                         participant.ApiKey = details.ApiKey;
-                        participant.GroupId = groupId;
                         participant.KeyExpirationDate = DateTime.UtcNow.AddDays(5); // DateTime.UtcNow.AddMinutes(40); //as part of the rules once they have started they will need to 
                         Context.Update(participant);
                         await this.Context.SaveChangesAsync();
@@ -239,35 +236,42 @@ namespace MainEnvironment.Web.Services
             try
             {
                 string uniqueCode = this.SecureTokenService.GenerateSecureToken(5);
-                //check for duplicates
-                //add check to ensure that we aren't getting confused with the same participant on another experiment - no need to check for null as if a participant's experiment is null, this needs to completely fail
-                var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId.Trim() && p.ExperimentId.Equals(experimentId));
-                if (participant == null)
+                var experiment = await this.Context.Experiments.SingleOrDefaultAsync(e => e.Id == experimentId);
+                if (experiment != null)
                 {
-                    participant = new Participant();
-                    participant.Id = Guid.NewGuid();
-                    participant.ExternalParticipantId = participantId.Trim();
-                    participant.ExperimentId = experimentId;
-                    participant.Completed = false;
-                    participant.CompletedDate = null;
-                    participant.ApiKey = null;
-                    participant.KeyExpirationDate = null;
-                    participant.ConsentFormAccepted = false;
-                    participant.ConsentFormAcceptedDate = null;
-                    participant.DownloadToken = null;
-                    participant.DownloadedEnvironment = false;
-                    participant.EquipmentType = equipment;
-                    participant.UniqueCode = uniqueCode;
-                    this.Context.Participants.Add(participant);
-                }
-                else
-                {
-                    participant.UniqueCode = uniqueCode;
-                    participant.EquipmentType = equipment;
-                }
+                    int groupId = this.ParticipantGroupService.AssignGroupToParticipant(experiment.TotalGroups);
 
-                await this.Context.SaveChangesAsync();
-                success = true;
+                    //check for duplicates
+                    //add check to ensure that we aren't getting confused with the same participant on another experiment - no need to check for null as if a participant's experiment is null, this needs to completely fail
+                    var participant = await this.Context.Participants.SingleOrDefaultAsync(p => p.ExternalParticipantId == participantId.Trim() && p.ExperimentId.Equals(experimentId));
+                    if (participant == null)
+                    {
+                        participant = new Participant();
+                        participant.Id = Guid.NewGuid();
+                        participant.ExternalParticipantId = participantId.Trim();
+                        participant.ExperimentId = experimentId;
+                        participant.Completed = false;
+                        participant.CompletedDate = null;
+                        participant.ApiKey = null;
+                        participant.KeyExpirationDate = null;
+                        participant.ConsentFormAccepted = false;
+                        participant.ConsentFormAcceptedDate = null;
+                        participant.DownloadToken = null;
+                        participant.DownloadedEnvironment = false;
+                        participant.EquipmentType = equipment;
+                        participant.UniqueCode = uniqueCode;
+                        participant.GroupId = groupId;
+                        this.Context.Participants.Add(participant);
+                    }
+                    else
+                    {
+                        participant.UniqueCode = uniqueCode;
+                        participant.EquipmentType = equipment;
+                        participant.GroupId = groupId;
+                    }
+                    await this.Context.SaveChangesAsync();
+                    success = true;
+                }
             }
             catch { }
             return success;
