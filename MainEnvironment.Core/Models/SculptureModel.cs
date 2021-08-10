@@ -9,5 +9,6 @@ namespace MainEnvironment.Core
     {
         public Guid SculptureId { get; set; }
         public int GroupId { get; set; }
+        public int? LevelId { get; set; }
     }
 }
